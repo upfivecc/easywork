@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh_CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EasyWork Auth</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .login-container {
+            height: 100vh;
+        }
+        .tab-active {
+            @apply bg-primary-500 text-white;
+        }
+    </style>
+</head>
+<body class="bg-primary-100">
+<div class="login-container flex flex-col md:flex-row">
+    <!-- 左侧区域 -->
+    <div class="w-full md:w-2/5 bg-primary-500 flex flex-col items-center justify-center p-8 text-white">
+        <div class="max-w-md text-center">
+            <div class="mb-8 flex justify-center">
+                <div class="bg-white text-primary-500 w-24 h-24 rounded-full flex items-center justify-center text-4xl font-bold shadow-lg">
+                    Auth
+                </div>
+            </div>
+            <h1 class="text-4xl font-bold mb-4">EasyWork Auth</h1>
+            <p class="text-primary-100 text-lg">让您有更多的时间陪家人、朋友</p>
+            <div class="mt-10">
+                <div class="flex justify-center space-x-4">
+                    <div class="bg-primary-400 p-4 rounded-full">
+                        <i class="fas fa-shield-alt text-xl"></i>
+                    </div>
+                    <div class="bg-primary-400 p-4 rounded-full">
+                        <i class="fas fa-lock text-xl"></i>
+                    </div>
+                    <div class="bg-primary-400 p-4 rounded-full">
+                        <i class="fas fa-user-shield text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 右侧登录区域 -->
+    <div class="w-full md:w-3/5 flex items-center justify-center p-8">
+        <div class="w-full max-w-md">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-gray-800">欢迎登录</h2>
+                <p class="text-gray-600 mt-2">请选择登录方式</p>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-xl p-8">
+                <!-- 登录选项卡 -->
+                <div class="flex bg-gray-100 rounded-lg mb-6">
+                    <button id="account-tab" class="tab-active flex-1 py-3 px-4 rounded-lg text-center font-medium transition-colors">
+                        账号登录
+                    </button>
+                    <button id="phone-tab" class="flex-1 py-3 px-4 rounded-lg text-center font-medium text-gray-600 transition-colors">
+                        手机登录
+                    </button>
+                </div>
+
+                <!-- 账号密码登录表单 -->
+                <div id="account-content" class="tab-content">
+                    <form class="login-form" action="/oauth2/login" method="post">
+                        <div class="mb-5">
+                            <label for="username" class="block text-gray-700 mb-2">用户名</label>
+                            <input type="text" id="username" name="username"
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-300 focus:border-primary-300 outline-none transition"
+                                   placeholder="请输入用户名" required>
+                        </div>
+                        <div class="mb-5">
+                            <label for="password" class="block text-gray-700 mb-2">密码</label>
+                            <input type="password" id="password" name="password"
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-300 focus:border-primary-300 outline-none transition"
+                                   placeholder="请输入密码" required>
+                        </div>
+                        <div class="flex justify-between items-center mb-6">
+                            <div class="flex items-center">
+                                <input type="checkbox" id="remember" name="remember" class="h-4 w-4 text-primary-500 rounded focus:ring-primary-400">
+                                <label for="remember" class="ml-2 text-gray-700">记住我</label>
+                            </div>
+                            <a href="#" class="text-primary-500 hover:text-primary-700 font-medium">忘记密码？</a>
+                        </div>
+                        <button type="submit" class="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold py-3 px-4 rounded-lg transition duration-300">
+                            登录
+                        </button>
+                    </form>
+                </div>
+
+                <!-- 手机号登录表单 -->
+                <div id="phone-content" class="tab-content hidden">
+                    <form class="login-form" action="/api/smsLogin" method="post">
+                        <div class="mb-5">
+                            <label for="phone-number" class="block text-gray-700 mb-2">手机号</label>
+                            <input type="tel" id="phone-number" name="phoneNumber"
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-300 focus:border-primary-300 outline-none transition"
+                                   placeholder="请输入手机号" required>
+                        </div>
+                        <div class="mb-5">
+                            <label for="sms-code" class="block text-gray-700 mb-2">验证码</label>
+                            <div class="flex space-x-3">
+                                <input type="text" id="sms-code" name="smsCode"
+                                       class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-300 focus:border-primary-300 outline-none transition"
+                                       placeholder="请输入验证码" required>
+                                <button type="button" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-3 px-4 rounded-lg transition whitespace-nowrap">
+                                    获取验证码
+                                </button>
+                            </div>
+                        </div>
+                        <button type="submit" class="w-full bg-primary-500 hover:bg-primary-600 text-white font-bold py-3 px-4 rounded-lg transition duration-300">
+                            登录
+                        </button>
+                    </form>
+                </div>
+
+                <!-- 第三方登录 -->
+                <div class="mt-8">
+                    <div class="flex items-center mb-6">
+                        <div class="flex-grow border-t border-gray-300"></div>
+                        <span class="mx-4 text-gray-500">第三方登录</span>
+                        <div class="flex-grow border-t border-gray-300"></div>
+                    </div>
+                    <div class="flex justify-center space-x-6">
+                        <button class="w-12 h-12 rounded-full bg-green-500 flex items-center justify-center text-white hover:bg-green-600 transition" title="微信登录">
+                            <i class="fab fa-weixin"></i>
+                        </button>
+                        <button class="w-12 h-12 rounded-full bg-red-500 flex items-center justify-center text-white hover:bg-red-600 transition" title="微博登录">
+                            <i class="fab fa-weibo"></i>
+                        </button>
+                        <button class="w-12 h-12 rounded-full bg-gray-800 flex items-center justify-center text-white hover:bg-gray-900 transition" title="GitHub登录">
+                            <i class="fab fa-github"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-6 text-gray-600">
+                还没有账号？<a href="/register" class="text-primary-500 hover:text-primary-700 font-medium">立即注册</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 切换登录方式
+    document.getElementById('account-tab').addEventListener('click', () => {
+        setActiveTab('account');
+    });
+
+    document.getElementById('phone-tab').addEventListener('click', () => {
+        setActiveTab('phone');
+    });
+
+    function setActiveTab(tabName) {
+        // 更新选项卡样式
+        document.getElementById('account-tab').classList.toggle('tab-active', tabName === 'account');
+        document.getElementById('account-tab').classList.toggle('text-gray-600', tabName !== 'account');
+        document.getElementById('phone-tab').classList.toggle('tab-active', tabName === 'phone');
+        document.getElementById('phone-tab').classList.toggle('text-gray-600', tabName !== 'phone');
+
+        // 显示对应内容
+        document.getElementById('account-content').classList.toggle('hidden', tabName !== 'account');
+        document.getElementById('phone-content').classList.toggle('hidden', tabName !== 'phone');
+    }
+
+    // 社交登录按钮事件
+    document.querySelector('.bg-green-500').addEventListener('click', () => {
+        window.location.href = '/oauth2/authorization/wechat';
+    });
+
+    document.querySelector('.bg-red-500').addEventListener('click', () => {
+        window.location.href = '/oauth2/authorization/weibo';
+    });
+
+    document.querySelector('.bg-gray-800').addEventListener('click', () => {
+        window.location.href = '/oauth2/authorization/github';
+    });
+</script>
+</body>
+</html>
