@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  easywork-auth:
+    image: easywork-auth
+    container_name: easywork-auth
+    restart: always
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./logs:/root/app/logs
+    environment:
+      - TZ=Asia/Shanghai
+      - JAVA_OPTS="-Xms512m -Xmx512m"

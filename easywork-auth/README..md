@@ -21,7 +21,7 @@
 ## 技术选型
 
 - [x] DDD领域模型
-- [x] Java 17+
+- [x] Jdk 17+
 - [x] Spring Boot 3.5.5
 - [x] Spring Security 6.5.3
 - [x] Spring Data JPA 3.5.5

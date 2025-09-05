@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  easywork-console:
+    image: easywork-console
+    container_name: easywork-console
+    restart: always
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./logs:/root/app/logs
+    environment:
+      - TZ=Asia/Shanghai
+      - JAVA_OPTS="-Xms512m -Xmx512m"
