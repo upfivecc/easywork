@@ -30,6 +30,10 @@ import java.util.stream.Collectors;
 @Repository
 public class MenuRepositoryImpl extends BaseRepositoryImpl<MenuMapper, MenuPO, Menu, MenuQuery> implements MenuRepository {
 
+    /**
+     * 菜单持久化方法 - 包含特殊的层级和路径处理逻辑
+     * 重写基类方法以处理菜单特有的业务逻辑
+     */
     @Override
     public Menu persist(Menu menu) {
         MenuPO menuPO = MenuConverter.INSTANCE.toRepository(menu);
@@ -78,18 +82,11 @@ public class MenuRepositoryImpl extends BaseRepositoryImpl<MenuMapper, MenuPO, M
         return MenuConverter.INSTANCE.toDomain(menuPO);
     }
 
-    @Override
-    public Optional<Menu> findById(Long id) {
-        if (id == null) {
-            return Optional.empty();
-        }
-
-        LambdaQueryWrapper<MenuPO> queryWrapper = super.queryWrapper();
-        queryWrapper.eq(MenuPO::getId, id);
-
-        MenuPO menuPO = super.getOne(queryWrapper);
-        return Optional.ofNullable(MenuConverter.INSTANCE.toDomain(menuPO));
-    }
+    /**
+     * 使用基类的通用 findById 方法
+     * 菜单查询没有特殊逻辑，可以直接使用基类实现
+     */
+    // findById 方法已由基类 BaseRepositoryImpl 提供
 
     @Override
     public Optional<Menu> findByCode(String code) {

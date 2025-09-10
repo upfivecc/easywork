@@ -30,6 +30,10 @@ import java.util.stream.Collectors;
 @Repository
 public class PermissionRepositoryImpl extends BaseRepositoryImpl<PermissionMapper, PermissionPO, Permission, PermissionQuery> implements PermissionRepository {
 
+    /**
+     * 权限持久化方法 - 包含特殊的层级和路径处理逻辑
+     * 重写基类方法以处理权限特有的业务逻辑
+     */
     @Override
     public Permission persist(Permission permission) {
         PermissionPO permissionPO = PermissionConverter.INSTANCE.toRepository(permission);
@@ -77,18 +81,11 @@ public class PermissionRepositoryImpl extends BaseRepositoryImpl<PermissionMappe
         return PermissionConverter.INSTANCE.toDomain(permissionPO);
     }
 
-    @Override
-    public Optional<Permission> findById(Long id) {
-        if (id == null) {
-            return Optional.empty();
-        }
-
-        LambdaQueryWrapper<PermissionPO> queryWrapper = super.queryWrapper();
-        queryWrapper.eq(PermissionPO::getId, id);
-
-        PermissionPO permissionPO = super.getOne(queryWrapper);
-        return Optional.ofNullable(PermissionConverter.INSTANCE.toDomain(permissionPO));
-    }
+    /**
+     * 使用基类的通用 findById 方法
+     * 权限查询没有特殊逻辑，可以直接使用基类实现
+     */
+    // findById 方法已由基类 BaseRepositoryImpl 提供
 
     @Override
     public Optional<Permission> findByCode(String code) {

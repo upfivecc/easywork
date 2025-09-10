@@ -29,27 +29,6 @@ import java.util.stream.Collectors;
 public class DictRepositoryImpl extends BaseRepositoryImpl<DictMapper, DictPO, Dict, DictQuery> implements DictRepository {
 
     @Override
-    public Dict persist(Dict dict) {
-        DictPO dictPO = DictConverter.INSTANCE.toRepository(dict);
-        // 使用基类的通用保存方法
-        DictPO savedPO = savePo(dictPO);
-        return DictConverter.INSTANCE.toDomain(savedPO);
-    }
-
-    @Override
-    public Optional<Dict> findById(Long id) {
-        if (id == null) {
-            return Optional.empty();
-        }
-
-        LambdaQueryWrapper<DictPO> queryWrapper = super.queryWrapper();
-        queryWrapper.eq(DictPO::getId, id);
-
-        DictPO dictPO = super.getOne(queryWrapper);
-        return Optional.ofNullable(DictConverter.INSTANCE.toDomain(dictPO));
-    }
-
-    @Override
     public Optional<Dict> findByCode(String code) {
         if (!StringUtils.hasText(code)) {
             return Optional.empty();

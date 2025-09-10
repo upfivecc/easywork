@@ -13,17 +13,8 @@ import org.mapstruct.factory.Mappers;
  * @date 2025/09/09
  */
 @Mapper
-public interface UserConverter {
+public interface UserConverter extends BaseConverter<UserPO, User>{
 
     UserConverter INSTANCE = Mappers.getMapper(UserConverter.class);
 
-    /**
-     * 领域对象转持久化对象
-     */
-    UserPO toRepository(User user);
-
-    /**
-     * 持久化对象转领域对象
-     */
-    User toDomain(UserPO userPO);
 }

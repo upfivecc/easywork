@@ -13,17 +13,9 @@ import org.mapstruct.factory.Mappers;
  * @date 2025/09/09
  */
 @Mapper
-public interface DictConverter {
+public interface DictConverter extends BaseConverter<DictPO, Dict>{
 
     DictConverter INSTANCE = Mappers.getMapper(DictConverter.class);
 
-    /**
-     * 领域对象转持久化对象
-     */
-    DictPO toRepository(Dict dict);
 
-    /**
-     * 持久化对象转领域对象
-     */
-    Dict toDomain(DictPO dictPO);
 }

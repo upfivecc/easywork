@@ -13,17 +13,8 @@ import org.mapstruct.factory.Mappers;
  * @date 2025/09/09
  */
 @Mapper
-public interface MenuConverter {
+public interface MenuConverter extends BaseConverter<MenuPO, Menu>{
 
     MenuConverter INSTANCE = Mappers.getMapper(MenuConverter.class);
 
-    /**
-     * 领域对象转持久化对象
-     */
-    MenuPO toRepository(Menu menu);
-
-    /**
-     * 持久化对象转领域对象
-     */
-    Menu toDomain(MenuPO menuPO);
 }

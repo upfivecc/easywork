@@ -35,20 +35,6 @@ public class UserRepositoryImpl extends BaseRepositoryImpl<UserMapper, UserPO, U
     private final UserMapper userMapper;
 
     @Override
-    public User persist(User user) {
-        UserPO userPO = UserConverter.INSTANCE.toRepository(user);
-        UserPO savedPo = savePo(userPO);
-        return UserConverter.INSTANCE.toDomain(savedPo);
-    }
-
-    @Override
-    public Optional<User> findById(Long id) {
-        UserPO userPO = userMapper.selectById(id);
-        return Optional.ofNullable(userPO)
-                .map(UserConverter.INSTANCE::toDomain);
-    }
-
-    @Override
     public Optional<User> findByUsername(String username) {
         LambdaQueryWrapper<UserPO> queryWrapper = super.queryWrapper();
         queryWrapper.eq(UserPO::getUsername, username);

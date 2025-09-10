@@ -30,26 +30,6 @@ import java.util.stream.Collectors;
 public class RoleRepositoryImpl extends BaseRepositoryImpl<RoleMapper, RolePO, Role, RoleQuery> implements RoleRepository {
 
     @Override
-    public Role persist(Role role) {
-        RolePO rolePO = RoleConverter.INSTANCE.toRepository(role);
-        RolePO savedPo = savePo(rolePO);
-        return RoleConverter.INSTANCE.toDomain(savedPo);
-    }
-
-    @Override
-    public Optional<Role> findById(Long id) {
-        if (id == null) {
-            return Optional.empty();
-        }
-
-        LambdaQueryWrapper<RolePO> queryWrapper = super.queryWrapper();
-        queryWrapper.eq(RolePO::getId, id);
-
-        RolePO rolePO = super.getOne(queryWrapper);
-        return Optional.ofNullable(RoleConverter.INSTANCE.toDomain(rolePO));
-    }
-
-    @Override
     public Optional<Role> findByCode(String code) {
         if (!StringUtils.hasText(code)) {
             return Optional.empty();

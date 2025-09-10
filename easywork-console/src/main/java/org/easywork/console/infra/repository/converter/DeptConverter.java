@@ -13,10 +13,8 @@ import org.mapstruct.factory.Mappers;
  * @date 2025/09/09
  */
 @Mapper
-public interface DeptConverter {
+public interface DeptConverter extends BaseConverter<DeptPO, Dept>{
 
     DeptConverter INSTANCE = Mappers.getMapper(DeptConverter.class);
 
-    Dept toDomain(DeptPO entity);
-    DeptPO toRepository(Dept domain);
 }

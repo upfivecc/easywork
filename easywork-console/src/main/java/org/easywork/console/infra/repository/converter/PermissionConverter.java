@@ -13,17 +13,8 @@ import org.mapstruct.factory.Mappers;
  * @date 2025/09/09
  */
 @Mapper
-public interface PermissionConverter {
+public interface PermissionConverter extends BaseConverter<PermissionPO, Permission>{
 
     PermissionConverter INSTANCE = Mappers.getMapper(PermissionConverter.class);
 
-    /**
-     * 领域对象转持久化对象
-     */
-    PermissionPO toRepository(Permission permission);
-
-    /**
-     * 持久化对象转领域对象
-     */
-    Permission toDomain(PermissionPO permissionPO);
 }

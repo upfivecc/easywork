@@ -2,7 +2,6 @@ package org.easywork.console.infra.repository;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +17,6 @@ import org.easywork.console.infra.repository.po.DeptPO;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -36,20 +34,6 @@ import java.util.stream.Collectors;
 public class DeptRepositoryImpl extends BaseRepositoryImpl<DeptMapper, DeptPO, Dept, DeptQuery> implements DeptRepository {
 
     private final DeptMapper deptMapper;
-
-    @Override
-    public Dept persist(Dept dept) {
-        DeptPO deptPO = DeptConverter.INSTANCE.toRepository(dept);
-        DeptPO savedPo = savePo(deptPO);
-        return DeptConverter.INSTANCE.toDomain(savedPo);
-    }
-
-    @Override
-    public Optional<Dept> findById(Long id) {
-        DeptPO deptPO = deptMapper.selectById(id);
-        return Optional.ofNullable(deptPO)
-                .map(DeptConverter.INSTANCE::toDomain);
-    }
 
     @Override
     public Optional<Dept> findByCode(String code) {

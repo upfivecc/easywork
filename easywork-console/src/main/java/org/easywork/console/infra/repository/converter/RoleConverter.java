@@ -13,17 +13,8 @@ import org.mapstruct.factory.Mappers;
  * @date 2025/09/09
  */
 @Mapper
-public interface RoleConverter {
+public interface RoleConverter extends BaseConverter<RolePO, Role>{
 
     RoleConverter INSTANCE = Mappers.getMapper(RoleConverter.class);
 
-    /**
-     * 领域对象转持久化对象
-     */
-    RolePO toRepository(Role role);
-
-    /**
-     * 持久化对象转领域对象
-     */
-    Role toDomain(RolePO rolePO);
 }
