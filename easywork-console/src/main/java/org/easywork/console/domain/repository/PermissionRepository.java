@@ -1,6 +1,7 @@
 package org.easywork.console.domain.repository;
 
 import org.easywork.console.domain.model.Permission;
+import org.easywork.console.domain.model.dto.PermissionQuery;
 import org.easywork.console.domain.repository.base.BaseRepository;
 
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.Optional;
  * @version: 1.0.0
  * @date: 2025/9/10 09:08
  */
-public interface PermissionRepository extends BaseRepository<Permission> {
+public interface PermissionRepository extends BaseRepository<Permission, PermissionQuery> {
     /**
      * 根据权限代码查找权限
      */

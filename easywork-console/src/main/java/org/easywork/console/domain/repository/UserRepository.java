@@ -1,6 +1,7 @@
 package org.easywork.console.domain.repository;
 
 import org.easywork.console.domain.model.User;
+import org.easywork.console.domain.model.dto.UserQuery;
 import org.easywork.console.domain.repository.base.BaseRepository;
 
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.Optional;
  * @version: 1.0.0
  * @date: 2025/9/10 09:07
  */
-public interface UserRepository extends BaseRepository<User> {
+public interface UserRepository extends BaseRepository<User, UserQuery> {
 
     /**
      * 根据用户名查找用户

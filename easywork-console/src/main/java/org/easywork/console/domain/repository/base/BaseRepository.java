@@ -1,5 +1,7 @@
 package org.easywork.console.domain.repository.base;
 
+import org.easywork.common.rest.request.PageQuery;
+import org.easywork.common.rest.result.PageInfo;
 import org.easywork.console.domain.model.base.BaseEntity;
 
 import java.util.List;
@@ -14,7 +16,7 @@ import java.util.Optional;
  * @version 1.0.0
  * @date 2025/09/10
  */
-public interface BaseRepository<T extends BaseEntity> {
+public interface BaseRepository<T extends BaseEntity, Q extends PageQuery> {
 
     /**
      * 保存实体（新增或更新）
@@ -46,4 +48,12 @@ public interface BaseRepository<T extends BaseEntity> {
      * @param ids 要删除的实体ID列表
      */
     void deleteByIds(List<Long> ids);
+
+    /**
+     * 分页查询
+     *
+     * @param query 查询参数
+     * @return 分页数据
+     */
+    PageInfo<T> findByPage(Q query);
 }

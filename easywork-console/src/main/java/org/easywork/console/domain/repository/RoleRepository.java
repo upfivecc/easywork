@@ -1,6 +1,7 @@
 package org.easywork.console.domain.repository;
 
 import org.easywork.console.domain.model.Role;
+import org.easywork.console.domain.model.dto.RoleQuery;
 import org.easywork.console.domain.repository.base.BaseRepository;
 
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.Optional;
  * @version: 1.0.0
  * @date: 2025/9/10 09:08
  */
-public interface RoleRepository extends BaseRepository<Role> {
+public interface RoleRepository extends BaseRepository<Role, RoleQuery> {
 
     /**
      * 根据角色代码查找角色

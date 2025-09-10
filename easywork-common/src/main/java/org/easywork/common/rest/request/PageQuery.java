@@ -18,4 +18,6 @@ public class PageQuery extends BaseReq {
     private Integer pageNum;
     private Integer pageSize;
 
+    private String keyword;
+
 }

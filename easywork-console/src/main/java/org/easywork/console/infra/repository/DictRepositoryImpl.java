@@ -4,7 +4,9 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.easywork.common.rest.result.PageInfo;
 import org.easywork.console.domain.model.Dict;
+import org.easywork.console.domain.model.dto.DictQuery;
 import org.easywork.console.domain.repository.DictRepository;
 import org.easywork.console.infra.repository.base.BaseRepositoryImpl;
 import org.easywork.console.infra.repository.converter.DictConverter;
@@ -142,5 +144,47 @@ public class DictRepositoryImpl extends BaseRepositoryImpl<DictMapper, DictPO> i
         updateEntity.setUpdateTime(LocalDateTime.now());
 
         super.update(updateEntity, queryWrapper);
+    }
+
+    @Override
+    public PageInfo<Dict> findByPage(DictQuery query) {
+        LambdaQueryWrapper<DictPO> queryWrapper = super.queryWrapper();
+        
+        // 关键字搜索：字典名称、字典编码、字典描述
+        String keyword = query.getKeyword();
+        if (StringUtils.hasText(keyword)) {
+            queryWrapper.and(wrapper -> wrapper
+                    .like(DictPO::getName, keyword)
+                    .or().like(DictPO::getCode, keyword)
+                    .or().like(DictPO::getDescription, keyword)
+            );
+        }
+        
+        // 按字典状态过滤（可选）
+        Integer status = query.getStatus();
+        if (status != null) {
+            queryWrapper.eq(DictPO::getStatus, status);
+        }
+        
+        // 按排序号升序，再按创建时间降序
+        queryWrapper.orderByAsc(DictPO::getSort)
+                    .orderByDesc(DictPO::getCreateTime);
+        
+        // 分页查询
+        IPage<DictPO> pageParam = new Page<>(query.getPageNum(), query.getPageSize());
+        IPage<DictPO> result = super.page(pageParam, queryWrapper);
+        
+        // 转换为域对象
+        List<Dict> dicts = result.getRecords().stream()
+                .map(DictConverter.INSTANCE::toDomain)
+                .collect(Collectors.toList());
+        
+        // 构建分页结果
+        return PageInfo.<Dict>builder()
+                .page(query.getPageNum())
+                .pageSize(query.getPageSize())
+                .total(result.getTotal())
+                .records(dicts)
+                .build();
     }
 }

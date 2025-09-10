@@ -1,5 +1,6 @@
 package org.easywork.common.rest.result;
 
+import lombok.Builder;
 import lombok.Data;
 
 import java.io.Serial;
@@ -11,6 +12,7 @@ import java.util.List;
  * @version: 1.0.0
  * @date: 2025/8/29 21:20
  */
+@Builder
 @Data
 public class PageInfo<T> implements Serializable {
 
@@ -24,12 +26,12 @@ public class PageInfo<T> implements Serializable {
     private int pages;
 
     public static <T> PageInfo<T> of(List<T> data, long total, int page, int pageSize, int pages) {
-        PageInfo<T> result = new PageInfo<>();
-        result.setRecords(data);
-        result.setTotal(total);
-        result.setPage(page);
-        result.setPageSize(pageSize);
-        result.setPages(pages);
-        return result;
+        return PageInfo.<T>builder()
+                .records(data)
+                .total(total)
+                .page(page)
+                .pageSize(pageSize)
+                .pages(pages)
+                .build();
     }
 }

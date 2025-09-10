@@ -1,10 +1,13 @@
 package org.easywork.console.infra.repository;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.easywork.common.rest.result.PageInfo;
 import org.easywork.console.domain.model.User;
+import org.easywork.console.domain.model.dto.UserQuery;
 import org.easywork.console.domain.repository.UserRepository;
 import org.easywork.console.infra.repository.base.BaseRepositoryImpl;
 import org.easywork.console.infra.repository.converter.UserConverter;
@@ -171,5 +174,60 @@ public class UserRepositoryImpl extends BaseRepositoryImpl<UserMapper, UserPO> i
         updateEntity.setUpdateTime(LocalDateTime.now());
 
         super.update(updateEntity, queryWrapper);
+    }
+
+    @Override
+    public PageInfo<User> findByPage(UserQuery query) {
+        LambdaQueryWrapper<UserPO> queryWrapper = super.queryWrapper();
+        
+        // 关键字搜索：用户名、昵称、真实姓名、邮箱、手机号
+        String keyword = query.getKeyword();
+        if (StringUtils.hasText(keyword)) {
+            queryWrapper.and(wrapper -> wrapper
+                    .like(UserPO::getUsername, keyword)
+                    .or().like(UserPO::getNickname, keyword)
+                    .or().like(UserPO::getRealName, keyword)
+                    .or().like(UserPO::getEmail, keyword)
+                    .or().like(UserPO::getPhone, keyword)
+            );
+        }
+        
+        // 按用户状态过滤（可选）
+        Integer status = query.getStatus();
+        if (status != null) {
+            queryWrapper.eq(UserPO::getStatus, status);
+        }
+        
+        // 按部门ID过滤（可选）
+        Long deptId = query.getDeptId();
+        if (deptId != null) {
+            queryWrapper.eq(UserPO::getDeptId, deptId);
+        }
+        
+        // 按性别过滤（可选）
+        Integer gender = query.getGender();
+        if (gender != null) {
+            queryWrapper.eq(UserPO::getGender, gender);
+        }
+        
+        // 按创建时间降序排序
+        queryWrapper.orderByDesc(UserPO::getCreateTime);
+        
+        // 分页查询
+        IPage<UserPO> pageParam = new Page<>(query.getPageNum(), query.getPageSize());
+        IPage<UserPO> result = super.page(pageParam, queryWrapper);
+        
+        // 转换为域对象
+        List<User> users = result.getRecords().stream()
+                .map(UserConverter.INSTANCE::toDomain)
+                .collect(Collectors.toList());
+        
+        // 构建分页结果
+        return PageInfo.<User>builder()
+                .page(query.getPageNum())
+                .pageSize(query.getPageSize())
+                .total(result.getTotal())
+                .records(users)
+                .build();
     }
 }

@@ -1,8 +1,12 @@
 package org.easywork.console.infra.repository;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.easywork.common.rest.result.PageInfo;
 import org.easywork.console.domain.model.Permission;
+import org.easywork.console.domain.model.dto.PermissionQuery;
 import org.easywork.console.domain.repository.PermissionRepository;
 import org.easywork.console.infra.common.utils.TreeUtils;
 import org.easywork.console.infra.repository.base.BaseRepositoryImpl;
@@ -15,6 +19,7 @@ import org.springframework.util.StringUtils;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * 权限仓储实现类
@@ -192,5 +197,59 @@ public class PermissionRepositoryImpl extends BaseRepositoryImpl<PermissionMappe
         updateEntity.setUpdateTime(LocalDateTime.now());
 
         super.update(updateEntity, queryWrapper);
+    }
+
+    @Override
+    public PageInfo<Permission> findByPage(PermissionQuery query) {
+        LambdaQueryWrapper<PermissionPO> queryWrapper = super.queryWrapper();
+        
+        // 关键字搜索：权限名称、权限代码、资源路径
+        String keyword = query.getKeyword();
+        if (StringUtils.hasText(keyword)) {
+            queryWrapper.and(wrapper -> wrapper
+                    .like(PermissionPO::getName, keyword)
+                    .or().like(PermissionPO::getCode, keyword)
+                    .or().like(PermissionPO::getResource, keyword)
+            );
+        }
+        
+        // 按权限类型过滤（可选）
+        Integer type = query.getType();
+        if (type != null) {
+            queryWrapper.eq(PermissionPO::getType, type);
+        }
+        
+        // 按权限状态过滤（可选）
+        Integer status = query.getStatus();
+        if (status != null) {
+            queryWrapper.eq(PermissionPO::getStatus, status);
+        }
+        
+        // 按HTTP方法过滤（可选）
+        String method = query.getMethod();
+        if (StringUtils.hasText(method)) {
+            queryWrapper.eq(PermissionPO::getMethod, method);
+        }
+        
+        // 按层级和排序号排序，再按创建时间降序
+        queryWrapper.orderByAsc(PermissionPO::getLevel, PermissionPO::getSort)
+                    .orderByDesc(PermissionPO::getCreateTime);
+        
+        // 分页查询
+        IPage<PermissionPO> pageParam = new Page<>(query.getPageNum(), query.getPageSize());
+        IPage<PermissionPO> result = super.page(pageParam, queryWrapper);
+        
+        // 转换为域对象
+        List<Permission> permissions = result.getRecords().stream()
+                .map(PermissionConverter.INSTANCE::toDomain)
+                .collect(Collectors.toList());
+        
+        // 构建分页结果
+        return PageInfo.<Permission>builder()
+                .page(query.getPageNum())
+                .pageSize(query.getPageSize())
+                .total(result.getTotal())
+                .records(permissions)
+                .build();
     }
 }
