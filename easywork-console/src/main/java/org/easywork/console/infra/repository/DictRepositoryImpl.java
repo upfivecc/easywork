@@ -42,9 +42,8 @@ public class DictRepositoryImpl extends BaseRepositoryImpl<DictMapper, DictPO> i
             return Optional.empty();
         }
 
-        LambdaQueryWrapper<DictPO> queryWrapper = Wrappers.lambdaQuery(DictPO.class);
-        queryWrapper.eq(DictPO::getId, id)
-                .eq(DictPO::getDeleted, 0);
+        LambdaQueryWrapper<DictPO> queryWrapper = super.queryWrapper();
+        queryWrapper.eq(DictPO::getId, id);
 
         DictPO dictPO = super.getOne(queryWrapper);
         return Optional.ofNullable(DictConverter.INSTANCE.toDomain(dictPO));
@@ -56,9 +55,8 @@ public class DictRepositoryImpl extends BaseRepositoryImpl<DictMapper, DictPO> i
             return Optional.empty();
         }
 
-        LambdaQueryWrapper<DictPO> queryWrapper = Wrappers.lambdaQuery(DictPO.class);
-        queryWrapper.eq(DictPO::getCode, code)
-                .eq(DictPO::getDeleted, 0);
+        LambdaQueryWrapper<DictPO> queryWrapper = super.queryWrapper();
+        queryWrapper.eq(DictPO::getCode, code);
 
         DictPO dictPO = super.getOne(queryWrapper);
         return Optional.ofNullable(DictConverter.INSTANCE.toDomain(dictPO));
@@ -66,8 +64,7 @@ public class DictRepositoryImpl extends BaseRepositoryImpl<DictMapper, DictPO> i
 
     @Override
     public List<Dict> findByPage(int page, int size, String keyword) {
-        LambdaQueryWrapper<DictPO> queryWrapper = Wrappers.lambdaQuery(DictPO.class);
-        queryWrapper.eq(DictPO::getDeleted, 0);
+        LambdaQueryWrapper<DictPO> queryWrapper = super.queryWrapper();
 
         if (StringUtils.hasText(keyword)) {
             queryWrapper.and(wrapper -> wrapper
@@ -88,8 +85,7 @@ public class DictRepositoryImpl extends BaseRepositoryImpl<DictMapper, DictPO> i
 
     @Override
     public long count(String keyword) {
-        LambdaQueryWrapper<DictPO> queryWrapper = Wrappers.lambdaQuery(DictPO.class);
-        queryWrapper.eq(DictPO::getDeleted, 0);
+        LambdaQueryWrapper<DictPO> queryWrapper = super.queryWrapper();
 
         if (StringUtils.hasText(keyword)) {
             queryWrapper.and(wrapper -> wrapper
@@ -104,9 +100,8 @@ public class DictRepositoryImpl extends BaseRepositoryImpl<DictMapper, DictPO> i
 
     @Override
     public List<Dict> findAllEnabled() {
-        LambdaQueryWrapper<DictPO> queryWrapper = Wrappers.lambdaQuery(DictPO.class);
+        LambdaQueryWrapper<DictPO> queryWrapper = super.queryWrapper();
         queryWrapper.eq(DictPO::getStatus, 1)
-                .eq(DictPO::getDeleted, 0)
                 .orderByAsc(DictPO::getSort)
                 .orderByDesc(DictPO::getCreateTime);
 
@@ -120,9 +115,8 @@ public class DictRepositoryImpl extends BaseRepositoryImpl<DictMapper, DictPO> i
             return false;
         }
 
-        LambdaQueryWrapper<DictPO> queryWrapper = Wrappers.lambdaQuery(DictPO.class);
-        queryWrapper.eq(DictPO::getCode, code)
-                .eq(DictPO::getDeleted, 0);
+        LambdaQueryWrapper<DictPO> queryWrapper = super.queryWrapper();
+        queryWrapper.eq(DictPO::getCode, code);
 
         return super.count(queryWrapper) > 0;
     }

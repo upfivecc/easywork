@@ -1,6 +1,8 @@
 package org.easywork.console.infra.repository.base;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.easywork.console.infra.repository.po.base.BasePO;
 
@@ -27,6 +29,12 @@ public abstract class BaseRepositoryImpl<M extends BaseMapper<T>, T extends Base
     public BaseRepositoryImpl() {
         // 第二个泛型参数是 T
         this.entityClass = (Class<T>) getGenericType(1);
+    }
+
+    protected LambdaQueryWrapper<T> queryWrapper() {
+        LambdaQueryWrapper<T> queryWrapper = Wrappers.lambdaQuery(entityClass);
+        queryWrapper.eq(BasePO::getDeleted, 0);
+        return queryWrapper;
     }
 
     /**

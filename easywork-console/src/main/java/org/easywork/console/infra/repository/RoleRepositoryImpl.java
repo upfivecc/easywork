@@ -40,9 +40,8 @@ public class RoleRepositoryImpl extends BaseRepositoryImpl<RoleMapper, RolePO> i
             return Optional.empty();
         }
 
-        LambdaQueryWrapper<RolePO> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(RolePO::getId, id)
-                .eq(RolePO::getDeleted, 0);
+        LambdaQueryWrapper<RolePO> queryWrapper = super.queryWrapper();
+        queryWrapper.eq(RolePO::getId, id);
 
         RolePO rolePO = super.getOne(queryWrapper);
         return Optional.ofNullable(RoleConverter.INSTANCE.toDomain(rolePO));
@@ -54,9 +53,8 @@ public class RoleRepositoryImpl extends BaseRepositoryImpl<RoleMapper, RolePO> i
             return Optional.empty();
         }
 
-        LambdaQueryWrapper<RolePO> queryWrapper = Wrappers.lambdaQuery(RolePO.class);
-        queryWrapper.eq(RolePO::getCode, code)
-                .eq(RolePO::getDeleted, 0);
+        LambdaQueryWrapper<RolePO> queryWrapper = super.queryWrapper();
+        queryWrapper.eq(RolePO::getCode, code);
 
         RolePO rolePO = super.getOne(queryWrapper);
         return Optional.ofNullable(RoleConverter.INSTANCE.toDomain(rolePO));
@@ -64,8 +62,7 @@ public class RoleRepositoryImpl extends BaseRepositoryImpl<RoleMapper, RolePO> i
 
     @Override
     public List<Role> findByPage(int page, int size, String keyword) {
-        LambdaQueryWrapper<RolePO> queryWrapper = Wrappers.lambdaQuery(RolePO.class);
-        queryWrapper.eq(RolePO::getDeleted, 0);
+        LambdaQueryWrapper<RolePO> queryWrapper = super.queryWrapper();
 
         if (StringUtils.hasText(keyword)) {
             queryWrapper.and(wrapper -> wrapper
@@ -86,8 +83,7 @@ public class RoleRepositoryImpl extends BaseRepositoryImpl<RoleMapper, RolePO> i
 
     @Override
     public long count(String keyword) {
-        LambdaQueryWrapper<RolePO> queryWrapper = Wrappers.lambdaQuery(RolePO.class);
-        queryWrapper.eq(RolePO::getDeleted, 0);
+        LambdaQueryWrapper<RolePO> queryWrapper = super.queryWrapper();
 
         if (StringUtils.hasText(keyword)) {
             queryWrapper.and(wrapper -> wrapper
@@ -102,9 +98,8 @@ public class RoleRepositoryImpl extends BaseRepositoryImpl<RoleMapper, RolePO> i
 
     @Override
     public List<Role> findAllEnabled() {
-        LambdaQueryWrapper<RolePO> queryWrapper = Wrappers.lambdaQuery(RolePO.class);
+        LambdaQueryWrapper<RolePO> queryWrapper = super.queryWrapper();
         queryWrapper.eq(RolePO::getStatus, 1)
-                .eq(RolePO::getDeleted, 0)
                 .orderByAsc(RolePO::getSort)
                 .orderByDesc(RolePO::getCreateTime);
 

@@ -2,7 +2,7 @@ package org.easywork.console.domain.model;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.easywork.console.domain.model.base.BaseEntity;
+import org.easywork.console.domain.model.base.TreeNode;
 
 import java.util.List;
 
@@ -15,7 +15,7 @@ import java.util.List;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class Dept extends BaseEntity {
+public class Dept extends TreeNode<Dept> {
 
     /**
      * 父部门ID

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import org.easywork.console.domain.model.Permission;
 import org.easywork.console.domain.repository.PermissionRepository;
+import org.easywork.console.infra.common.utils.TreeUtils;
 import org.easywork.console.infra.repository.base.BaseRepositoryImpl;
 import org.easywork.console.infra.repository.converter.PermissionConverter;
 import org.easywork.console.infra.repository.mapper.PermissionMapper;
@@ -12,11 +13,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * 权限仓储实现类
@@ -81,9 +79,8 @@ public class PermissionRepositoryImpl extends BaseRepositoryImpl<PermissionMappe
             return Optional.empty();
         }
 
-        LambdaQueryWrapper<PermissionPO> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(PermissionPO::getId, id)
-                .eq(PermissionPO::getDeleted, 0);
+        LambdaQueryWrapper<PermissionPO> queryWrapper = super.queryWrapper();
+        queryWrapper.eq(PermissionPO::getId, id);
 
         PermissionPO permissionPO = super.getOne(queryWrapper);
         return Optional.ofNullable(PermissionConverter.INSTANCE.toDomain(permissionPO));
@@ -95,9 +92,8 @@ public class PermissionRepositoryImpl extends BaseRepositoryImpl<PermissionMappe
             return Optional.empty();
         }
 
-        LambdaQueryWrapper<PermissionPO> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(PermissionPO::getCode, code)
-                .eq(PermissionPO::getDeleted, 0);
+        LambdaQueryWrapper<PermissionPO> queryWrapper = super.queryWrapper();
+        queryWrapper.eq(PermissionPO::getCode, code);
 
         PermissionPO permissionPO = super.getOne(queryWrapper);
         return Optional.ofNullable(PermissionConverter.INSTANCE.toDomain(permissionPO));
@@ -105,21 +101,19 @@ public class PermissionRepositoryImpl extends BaseRepositoryImpl<PermissionMappe
 
     @Override
     public List<Permission> findAllAsTree() {
-        LambdaQueryWrapper<PermissionPO> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(PermissionPO::getDeleted, 0)
-                .orderByAsc(PermissionPO::getLevel)
+        LambdaQueryWrapper<PermissionPO> queryWrapper = super.queryWrapper();
+        queryWrapper.orderByAsc(PermissionPO::getLevel)
                 .orderByAsc(PermissionPO::getSort)
                 .orderByDesc(PermissionPO::getCreateTime);
 
         List<PermissionPO> allPermissions = super.list(queryWrapper);
-        return buildTree(allPermissions.stream().map(PermissionConverter.INSTANCE::toDomain).toList());
+        return TreeUtils.buildTree(allPermissions.stream().map(PermissionConverter.INSTANCE::toDomain).toList(), 0L);
     }
 
     @Override
     public List<Permission> findByParentId(Long parentId) {
-        LambdaQueryWrapper<PermissionPO> queryWrapper = new LambdaQueryWrapper<>();
+        LambdaQueryWrapper<PermissionPO> queryWrapper = super.queryWrapper();
         queryWrapper.eq(PermissionPO::getParentId, parentId != null ? parentId : 0)
-                .eq(PermissionPO::getDeleted, 0)
                 .orderByAsc(PermissionPO::getSort)
                 .orderByDesc(PermissionPO::getCreateTime);
 
@@ -150,9 +144,8 @@ public class PermissionRepositoryImpl extends BaseRepositoryImpl<PermissionMappe
             return List.of();
         }
 
-        LambdaQueryWrapper<PermissionPO> queryWrapper = new LambdaQueryWrapper<>();
+        LambdaQueryWrapper<PermissionPO> queryWrapper = super.queryWrapper();
         queryWrapper.eq(PermissionPO::getType, type)
-                .eq(PermissionPO::getDeleted, 0)
                 .orderByAsc(PermissionPO::getLevel)
                 .orderByAsc(PermissionPO::getSort)
                 .orderByDesc(PermissionPO::getCreateTime);
@@ -162,9 +155,8 @@ public class PermissionRepositoryImpl extends BaseRepositoryImpl<PermissionMappe
 
     @Override
     public List<Permission> findAllEnabled() {
-        LambdaQueryWrapper<PermissionPO> queryWrapper = new LambdaQueryWrapper<>();
+        LambdaQueryWrapper<PermissionPO> queryWrapper = super.queryWrapper();
         queryWrapper.eq(PermissionPO::getStatus, 1)
-                .eq(PermissionPO::getDeleted, 0)
                 .orderByAsc(PermissionPO::getLevel)
                 .orderByAsc(PermissionPO::getSort)
                 .orderByDesc(PermissionPO::getCreateTime);
@@ -178,9 +170,8 @@ public class PermissionRepositoryImpl extends BaseRepositoryImpl<PermissionMappe
             return false;
         }
 
-        LambdaQueryWrapper<PermissionPO> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(PermissionPO::getCode, code)
-                .eq(PermissionPO::getDeleted, 0);
+        LambdaQueryWrapper<PermissionPO> queryWrapper = super.queryWrapper();
+        queryWrapper.eq(PermissionPO::getCode, code);
 
         return super.count(queryWrapper) > 0;
     }
@@ -201,34 +192,5 @@ public class PermissionRepositoryImpl extends BaseRepositoryImpl<PermissionMappe
         updateEntity.setUpdateTime(LocalDateTime.now());
 
         super.update(updateEntity, queryWrapper);
-    }
-
-    /**
-     * 构建权限树形结构
-     */
-    private List<Permission> buildTree(List<Permission> allPermissions) {
-        if (allPermissions == null || allPermissions.isEmpty()) {
-            return new ArrayList<>();
-        }
-
-        // 按父ID分组
-        Map<Long, List<Permission>> groupByParent = allPermissions.stream()
-                .collect(Collectors.groupingBy(permission ->
-                        permission.getParentId() != null ? permission.getParentId() : 0L));
-
-        // 构建树形结构
-        List<Permission> rootPermissions = groupByParent.getOrDefault(0L, new ArrayList<>());
-
-        for (Permission permission : allPermissions) {
-            List<Permission> children = groupByParent.get(permission.getId());
-            if (children != null && !children.isEmpty()) {
-                permission.setChildren(children);
-                permission.setIsLeaf(false);
-            } else {
-                permission.setIsLeaf(true);
-            }
-        }
-
-        return rootPermissions;
     }
 }

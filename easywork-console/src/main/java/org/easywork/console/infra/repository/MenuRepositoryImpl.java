@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import org.easywork.console.domain.model.Menu;
 import org.easywork.console.domain.repository.MenuRepository;
+import org.easywork.console.infra.common.utils.TreeUtils;
 import org.easywork.console.infra.repository.base.BaseRepositoryImpl;
 import org.easywork.console.infra.repository.converter.MenuConverter;
 import org.easywork.console.infra.repository.mapper.MenuMapper;
@@ -12,11 +13,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * 菜单仓储实现类
@@ -82,9 +80,8 @@ public class MenuRepositoryImpl extends BaseRepositoryImpl<MenuMapper, MenuPO> i
             return Optional.empty();
         }
 
-        LambdaQueryWrapper<MenuPO> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(MenuPO::getId, id)
-                .eq(MenuPO::getDeleted, 0);
+        LambdaQueryWrapper<MenuPO> queryWrapper = super.queryWrapper();
+        queryWrapper.eq(MenuPO::getId, id);
 
         MenuPO menuPO = super.getOne(queryWrapper);
         return Optional.ofNullable(MenuConverter.INSTANCE.toDomain(menuPO));
@@ -96,9 +93,8 @@ public class MenuRepositoryImpl extends BaseRepositoryImpl<MenuMapper, MenuPO> i
             return Optional.empty();
         }
 
-        LambdaQueryWrapper<MenuPO> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(MenuPO::getCode, code)
-                .eq(MenuPO::getDeleted, 0);
+        LambdaQueryWrapper<MenuPO> queryWrapper = super.queryWrapper();
+        queryWrapper.eq(MenuPO::getCode, code);
 
         MenuPO menuPO = super.getOne(queryWrapper);
         return Optional.ofNullable(MenuConverter.INSTANCE.toDomain(menuPO));
@@ -106,21 +102,19 @@ public class MenuRepositoryImpl extends BaseRepositoryImpl<MenuMapper, MenuPO> i
 
     @Override
     public List<Menu> findAllAsTree() {
-        LambdaQueryWrapper<MenuPO> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(MenuPO::getDeleted, 0)
-                .orderByAsc(MenuPO::getLevel)
+        LambdaQueryWrapper<MenuPO> queryWrapper = super.queryWrapper();
+        queryWrapper.orderByAsc(MenuPO::getLevel)
                 .orderByAsc(MenuPO::getSort)
                 .orderByDesc(MenuPO::getCreateTime);
 
         List<MenuPO> allMenus = super.list(queryWrapper);
-        return buildTree(allMenus.stream().map(MenuConverter.INSTANCE::toDomain).toList());
+        return TreeUtils.buildTree(allMenus.stream().map(MenuConverter.INSTANCE::toDomain).toList(), 0L);
     }
 
     @Override
     public List<Menu> findByParentId(Long parentId) {
-        LambdaQueryWrapper<MenuPO> queryWrapper = new LambdaQueryWrapper<>();
+        LambdaQueryWrapper<MenuPO> queryWrapper = super.queryWrapper();
         queryWrapper.eq(MenuPO::getParentId, parentId != null ? parentId : 0)
-                .eq(MenuPO::getDeleted, 0)
                 .orderByAsc(MenuPO::getSort)
                 .orderByDesc(MenuPO::getCreateTime);
 
@@ -151,9 +145,8 @@ public class MenuRepositoryImpl extends BaseRepositoryImpl<MenuMapper, MenuPO> i
             return List.of();
         }
 
-        LambdaQueryWrapper<MenuPO> queryWrapper = new LambdaQueryWrapper<>();
+        LambdaQueryWrapper<MenuPO> queryWrapper = super.queryWrapper();
         queryWrapper.eq(MenuPO::getType, type)
-                .eq(MenuPO::getDeleted, 0)
                 .orderByAsc(MenuPO::getLevel)
                 .orderByAsc(MenuPO::getSort)
                 .orderByDesc(MenuPO::getCreateTime);
@@ -163,28 +156,26 @@ public class MenuRepositoryImpl extends BaseRepositoryImpl<MenuMapper, MenuPO> i
 
     @Override
     public List<Menu> findAllVisible() {
-        LambdaQueryWrapper<MenuPO> queryWrapper = new LambdaQueryWrapper<>();
+        LambdaQueryWrapper<MenuPO> queryWrapper = super.queryWrapper();
         queryWrapper.eq(MenuPO::getVisible, 1)
-                .eq(MenuPO::getDeleted, 0)
                 .orderByAsc(MenuPO::getLevel)
                 .orderByAsc(MenuPO::getSort)
                 .orderByDesc(MenuPO::getCreateTime);
 
         List<MenuPO> allMenus = super.list(queryWrapper);
-        return buildTree(allMenus.stream().map(MenuConverter.INSTANCE::toDomain).toList());
+        return TreeUtils.buildTree(allMenus.stream().map(MenuConverter.INSTANCE::toDomain).toList(), 0L);
     }
 
     @Override
     public List<Menu> findAllEnabled() {
-        LambdaQueryWrapper<MenuPO> queryWrapper = new LambdaQueryWrapper<>();
+        LambdaQueryWrapper<MenuPO> queryWrapper = super.queryWrapper();
         queryWrapper.eq(MenuPO::getStatus, 1)
-                .eq(MenuPO::getDeleted, 0)
                 .orderByAsc(MenuPO::getLevel)
                 .orderByAsc(MenuPO::getSort)
                 .orderByDesc(MenuPO::getCreateTime);
 
         List<MenuPO> allMenus = super.list(queryWrapper);
-        return buildTree(allMenus.stream().map(MenuConverter.INSTANCE::toDomain).toList());
+        return TreeUtils.buildTree(allMenus.stream().map(MenuConverter.INSTANCE::toDomain).toList(), 0L);
     }
 
     @Override
@@ -193,9 +184,8 @@ public class MenuRepositoryImpl extends BaseRepositoryImpl<MenuMapper, MenuPO> i
             return false;
         }
 
-        LambdaQueryWrapper<MenuPO> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(MenuPO::getCode, code)
-                .eq(MenuPO::getDeleted, 0);
+        LambdaQueryWrapper<MenuPO> queryWrapper = super.queryWrapper();
+        queryWrapper.eq(MenuPO::getCode, code);
 
         return super.count(queryWrapper) > 0;
     }
@@ -215,34 +205,5 @@ public class MenuRepositoryImpl extends BaseRepositoryImpl<MenuMapper, MenuPO> i
         updateEntity.setUpdateTime(LocalDateTime.now());
 
         super.update(updateEntity, queryWrapper);
-    }
-
-    /**
-     * 构建菜单树形结构
-     */
-    private List<Menu> buildTree(List<Menu> allMenus) {
-        if (allMenus == null || allMenus.isEmpty()) {
-            return new ArrayList<>();
-        }
-
-        // 按父ID分组
-        Map<Long, List<Menu>> groupByParent = allMenus.stream()
-                .collect(Collectors.groupingBy(menu ->
-                        menu.getParentId() != null ? menu.getParentId() : 0L));
-
-        // 构建树形结构
-        List<Menu> rootMenus = groupByParent.getOrDefault(0L, new ArrayList<>());
-
-        for (Menu menu : allMenus) {
-            List<Menu> children = groupByParent.get(menu.getId());
-            if (children != null && !children.isEmpty()) {
-                menu.setChildren(children);
-                menu.setIsLeaf(false);
-            } else {
-                menu.setIsLeaf(true);
-            }
-        }
-
-        return rootMenus;
     }
 }

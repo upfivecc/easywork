@@ -1,7 +1,6 @@
 package org.easywork.console.infra.repository;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,9 +48,8 @@ public class UserRepositoryImpl extends BaseRepositoryImpl<UserMapper, UserPO> i
 
     @Override
     public Optional<User> findByUsername(String username) {
-        LambdaQueryWrapper<UserPO> queryWrapper = Wrappers.lambdaQuery(UserPO.class);
-        queryWrapper.eq(UserPO::getUsername, username)
-                .eq(UserPO::getDeleted, 0);
+        LambdaQueryWrapper<UserPO> queryWrapper = super.queryWrapper();
+        queryWrapper.eq(UserPO::getUsername, username);
         UserPO userPO = userMapper.selectOne(queryWrapper);
         return Optional.ofNullable(userPO)
                 .map(UserConverter.INSTANCE::toDomain);
@@ -59,9 +57,8 @@ public class UserRepositoryImpl extends BaseRepositoryImpl<UserMapper, UserPO> i
 
     @Override
     public Optional<User> findByEmail(String email) {
-        LambdaQueryWrapper<UserPO> queryWrapper = Wrappers.lambdaQuery(UserPO.class);
-        queryWrapper.eq(UserPO::getEmail, email)
-                .eq(UserPO::getDeleted, 0);
+        LambdaQueryWrapper<UserPO> queryWrapper = super.queryWrapper();
+        queryWrapper.eq(UserPO::getEmail, email);
         UserPO userPO = userMapper.selectOne(queryWrapper);
         return Optional.ofNullable(userPO)
                 .map(UserConverter.INSTANCE::toDomain);
@@ -69,9 +66,8 @@ public class UserRepositoryImpl extends BaseRepositoryImpl<UserMapper, UserPO> i
 
     @Override
     public Optional<User> findByPhone(String phone) {
-        LambdaQueryWrapper<UserPO> queryWrapper = Wrappers.lambdaQuery(UserPO.class);
-        queryWrapper.eq(UserPO::getPhone, phone)
-                .eq(UserPO::getDeleted, 0);
+        LambdaQueryWrapper<UserPO> queryWrapper = super.queryWrapper();
+        queryWrapper.eq(UserPO::getPhone, phone);
         UserPO userPO = userMapper.selectOne(queryWrapper);
         return Optional.ofNullable(userPO)
                 .map(UserConverter.INSTANCE::toDomain);
@@ -79,8 +75,7 @@ public class UserRepositoryImpl extends BaseRepositoryImpl<UserMapper, UserPO> i
 
     @Override
     public List<User> findByPage(int page, int size, String keyword) {
-        LambdaQueryWrapper<UserPO> queryWrapper = Wrappers.lambdaQuery(UserPO.class);
-        queryWrapper.eq(UserPO::getDeleted, 0);
+        LambdaQueryWrapper<UserPO> queryWrapper = super.queryWrapper();
 
         if (StringUtils.hasText(keyword)) {
             queryWrapper.and(wrapper -> wrapper
@@ -104,8 +99,7 @@ public class UserRepositoryImpl extends BaseRepositoryImpl<UserMapper, UserPO> i
 
     @Override
     public long count(String keyword) {
-        LambdaQueryWrapper<UserPO> queryWrapper = Wrappers.lambdaQuery(UserPO.class);
-        queryWrapper.eq(UserPO::getDeleted, 0);
+        LambdaQueryWrapper<UserPO> queryWrapper = super.queryWrapper();
 
         if (StringUtils.hasText(keyword)) {
             queryWrapper.and(wrapper -> wrapper
@@ -122,9 +116,8 @@ public class UserRepositoryImpl extends BaseRepositoryImpl<UserMapper, UserPO> i
 
     @Override
     public List<User> findByDeptId(Long deptId) {
-        LambdaQueryWrapper<UserPO> queryWrapper = Wrappers.lambdaQuery(UserPO.class);
+        LambdaQueryWrapper<UserPO> queryWrapper = super.queryWrapper();
         queryWrapper.eq(UserPO::getDeptId, deptId)
-                .eq(UserPO::getDeleted, 0)
                 .orderByDesc(UserPO::getCreateTime);
         List<UserPO> userPOs = userMapper.selectList(queryWrapper);
         return userPOs.stream()
@@ -142,25 +135,22 @@ public class UserRepositoryImpl extends BaseRepositoryImpl<UserMapper, UserPO> i
 
     @Override
     public boolean existsByUsername(String username) {
-        LambdaQueryWrapper<UserPO> queryWrapper = Wrappers.lambdaQuery(UserPO.class);
-        queryWrapper.eq(UserPO::getUsername, username)
-                .eq(UserPO::getDeleted, 0);
+        LambdaQueryWrapper<UserPO> queryWrapper = super.queryWrapper();
+        queryWrapper.eq(UserPO::getUsername, username);
         return userMapper.selectCount(queryWrapper) > 0;
     }
 
     @Override
     public boolean existsByEmail(String email) {
-        LambdaQueryWrapper<UserPO> queryWrapper = Wrappers.lambdaQuery(UserPO.class);
-        queryWrapper.eq(UserPO::getEmail, email)
-                .eq(UserPO::getDeleted, 0);
+        LambdaQueryWrapper<UserPO> queryWrapper = super.queryWrapper();
+        queryWrapper.eq(UserPO::getEmail, email);
         return userMapper.selectCount(queryWrapper) > 0;
     }
 
     @Override
     public boolean existsByPhone(String phone) {
-        LambdaQueryWrapper<UserPO> queryWrapper = Wrappers.lambdaQuery(UserPO.class);
-        queryWrapper.eq(UserPO::getPhone, phone)
-                .eq(UserPO::getDeleted, 0);
+        LambdaQueryWrapper<UserPO> queryWrapper = super.queryWrapper();
+        queryWrapper.eq(UserPO::getPhone, phone);
         return userMapper.selectCount(queryWrapper) > 0;
     }
 
@@ -173,7 +163,7 @@ public class UserRepositoryImpl extends BaseRepositoryImpl<UserMapper, UserPO> i
     @Override
     public void deleteByIds(List<Long> ids) {
         // 批量逻辑删除
-        LambdaQueryWrapper<UserPO> queryWrapper = Wrappers.lambdaQuery(UserPO.class);
+        LambdaQueryWrapper<UserPO> queryWrapper = super.queryWrapper();
         queryWrapper.in(UserPO::getId, ids);
 
         UserPO updateEntity = new UserPO();
