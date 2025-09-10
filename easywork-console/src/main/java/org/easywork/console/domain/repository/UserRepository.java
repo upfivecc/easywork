@@ -30,16 +30,6 @@ public interface UserRepository extends BaseRepository<User, UserQuery> {
     Optional<User> findByPhone(String phone);
 
     /**
-     * 分页查询用户
-     */
-    List<User> findByPage(int page, int size, String keyword);
-
-    /**
-     * 统计用户数量
-     */
-    long count(String keyword);
-
-    /**
      * 根据部门ID查找用户
      */
     List<User> findByDeptId(Long deptId);

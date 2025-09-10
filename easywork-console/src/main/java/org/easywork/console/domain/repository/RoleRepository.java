@@ -20,16 +20,6 @@ public interface RoleRepository extends BaseRepository<Role, RoleQuery> {
     Optional<Role> findByCode(String code);
 
     /**
-     * 分页查询角色
-     */
-    List<Role> findByPage(int page, int size, String keyword);
-
-    /**
-     * 统计角色数量
-     */
-    long count(String keyword);
-
-    /**
      * 查找所有启用的角色
      */
     List<Role> findAllEnabled();

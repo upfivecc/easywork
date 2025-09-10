@@ -1,11 +1,8 @@
 package org.easywork.console.infra.repository;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.easywork.common.rest.result.PageInfo;
 import org.easywork.console.domain.model.User;
 import org.easywork.console.domain.model.dto.UserQuery;
 import org.easywork.console.domain.repository.UserRepository;
@@ -17,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -62,40 +60,16 @@ public class UserRepositoryImpl extends BaseRepositoryImpl<UserMapper, UserPO, U
     }
 
     @Override
-    public List<User> findByPage(int page, int size, String keyword) {
+    public long count(UserQuery query) {
         LambdaQueryWrapper<UserPO> queryWrapper = super.queryWrapper();
 
-        if (StringUtils.hasText(keyword)) {
+        if (Objects.nonNull(query)) {
             queryWrapper.and(wrapper -> wrapper
-                    .like(UserPO::getUsername, keyword)
-                    .or().like(UserPO::getNickname, keyword)
-                    .or().like(UserPO::getRealName, keyword)
-                    .or().like(UserPO::getEmail, keyword)
-                    .or().like(UserPO::getPhone, keyword)
-            );
-        }
-
-        queryWrapper.orderByDesc(UserPO::getCreateTime);
-
-        Page<UserPO> pageParam = new Page<>(page, size);
-        Page<UserPO> pageResult = userMapper.selectPage(pageParam, queryWrapper);
-
-        return pageResult.getRecords().stream()
-                .map(UserConverter.INSTANCE::toDomain)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public long count(String keyword) {
-        LambdaQueryWrapper<UserPO> queryWrapper = super.queryWrapper();
-
-        if (StringUtils.hasText(keyword)) {
-            queryWrapper.and(wrapper -> wrapper
-                    .like(UserPO::getUsername, keyword)
-                    .or().like(UserPO::getNickname, keyword)
-                    .or().like(UserPO::getRealName, keyword)
-                    .or().like(UserPO::getEmail, keyword)
-                    .or().like(UserPO::getPhone, keyword)
+                    .like(UserPO::getUsername, query.getKeyword())
+                    .or().like(UserPO::getNickname, query.getKeyword())
+                    .or().like(UserPO::getRealName, query.getKeyword())
+                    .or().like(UserPO::getEmail, query.getKeyword())
+                    .or().like(UserPO::getPhone, query.getKeyword())
             );
         }
 
@@ -143,9 +117,7 @@ public class UserRepositoryImpl extends BaseRepositoryImpl<UserMapper, UserPO, U
     }
 
     @Override
-    public PageInfo<User> findByPage(UserQuery query) {
-        LambdaQueryWrapper<UserPO> queryWrapper = super.queryWrapper();
-        
+    protected void buildQuery(LambdaQueryWrapper<UserPO> queryWrapper, UserQuery query) {
         // 关键字搜索：用户名、昵称、真实姓名、邮箱、手机号
         String keyword = query.getKeyword();
         if (StringUtils.hasText(keyword)) {
@@ -157,43 +129,26 @@ public class UserRepositoryImpl extends BaseRepositoryImpl<UserMapper, UserPO, U
                     .or().like(UserPO::getPhone, keyword)
             );
         }
-        
+
         // 按用户状态过滤（可选）
         Integer status = query.getStatus();
         if (status != null) {
             queryWrapper.eq(UserPO::getStatus, status);
         }
-        
+
         // 按部门ID过滤（可选）
         Long deptId = query.getDeptId();
         if (deptId != null) {
             queryWrapper.eq(UserPO::getDeptId, deptId);
         }
-        
+
         // 按性别过滤（可选）
         Integer gender = query.getGender();
         if (gender != null) {
             queryWrapper.eq(UserPO::getGender, gender);
         }
-        
+
         // 按创建时间降序排序
         queryWrapper.orderByDesc(UserPO::getCreateTime);
-        
-        // 分页查询
-        IPage<UserPO> pageParam = new Page<>(query.getPageNum(), query.getPageSize());
-        IPage<UserPO> result = super.page(pageParam, queryWrapper);
-        
-        // 转换为域对象
-        List<User> users = result.getRecords().stream()
-                .map(UserConverter.INSTANCE::toDomain)
-                .collect(Collectors.toList());
-        
-        // 构建分页结果
-        return PageInfo.<User>builder()
-                .page(query.getPageNum())
-                .pageSize(query.getPageSize())
-                .total(result.getTotal())
-                .records(users)
-                .build();
     }
 }

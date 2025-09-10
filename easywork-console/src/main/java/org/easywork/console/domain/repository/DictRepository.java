@@ -20,16 +20,6 @@ public interface DictRepository extends BaseRepository<Dict, DictQuery> {
     Optional<Dict> findByCode(String code);
 
     /**
-     * 分页查询字典
-     */
-    List<Dict> findByPage(int page, int size, String keyword);
-
-    /**
-     * 统计字典数量
-     */
-    long count(String keyword);
-
-    /**
      * 查找所有启用的字典
      */
     List<Dict> findAllEnabled();

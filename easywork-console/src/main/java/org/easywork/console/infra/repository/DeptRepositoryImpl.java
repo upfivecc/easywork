@@ -1,11 +1,8 @@
 package org.easywork.console.infra.repository;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.easywork.common.rest.result.PageInfo;
 import org.easywork.console.domain.model.Dept;
 import org.easywork.console.domain.model.dto.DeptQuery;
 import org.easywork.console.domain.repository.DeptRepository;
@@ -109,9 +106,7 @@ public class DeptRepositoryImpl extends BaseRepositoryImpl<DeptMapper, DeptPO, D
     }
 
     @Override
-    public PageInfo<Dept> findByPage(DeptQuery pageQuery) {
-        LambdaQueryWrapper<DeptPO> queryWrapper = super.queryWrapper();
-
+    protected void buildQuery(LambdaQueryWrapper<DeptPO> queryWrapper, DeptQuery pageQuery) {
         // 关键字搜索：部门名称、部门编码、负责人姓名
         String keyword = pageQuery.getKeyword();
         if (StringUtils.hasText(keyword)) {
@@ -137,23 +132,11 @@ public class DeptRepositoryImpl extends BaseRepositoryImpl<DeptMapper, DeptPO, D
         // 按层级和排序号排序，再按创建时间降序
         queryWrapper.orderByAsc(DeptPO::getLevel, DeptPO::getSort)
                 .orderByDesc(DeptPO::getCreateTime);
+    }
 
-        // 分页查询
-        IPage<DeptPO> pageParam = new Page<>(pageQuery.getPageNum(), pageQuery.getPageSize());
-        IPage<DeptPO> result = super.page(pageParam, queryWrapper);
-
-        // 转换为域对象
-        List<Dept> depts = result.getRecords().stream()
-                .map(DeptConverter.INSTANCE::toDomain)
-                .collect(Collectors.toList());
-
-        // 构建分页结果
-        return PageInfo.<Dept>builder()
-                .page(pageQuery.getPageNum())
-                .pageSize(pageQuery.getPageSize())
-                .total(result.getTotal())
-                .records(depts)
-                .build();
+    @Override
+    public long count(DeptQuery query) {
+        return 0;
     }
 
     @Override

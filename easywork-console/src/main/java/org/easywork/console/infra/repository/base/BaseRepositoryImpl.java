@@ -3,11 +3,18 @@ package org.easywork.console.infra.repository.base;
 import cn.hutool.core.util.ReflectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.easywork.common.rest.request.PageQuery;
+import org.easywork.common.rest.result.PageInfo;
+import org.easywork.console.domain.model.Dept;
 import org.easywork.console.domain.model.base.BaseEntity;
+import org.easywork.console.domain.model.dto.DeptQuery;
 import org.easywork.console.domain.repository.base.BaseRepository;
+import org.easywork.console.infra.repository.converter.DeptConverter;
+import org.easywork.console.infra.repository.po.DeptPO;
 import org.easywork.console.infra.repository.po.base.BasePO;
 
 import java.lang.reflect.Field;
@@ -17,6 +24,7 @@ import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * 基础仓储实现类
@@ -212,6 +220,31 @@ public abstract class BaseRepositoryImpl<M extends BaseMapper<T>, T extends Base
         T po = super.getOne(queryWrapper);
         return Optional.ofNullable(po).map(this::convertToDomain);
     }
+
+    @Override
+    public PageInfo<B> findByPage(Q pageQuery) {
+        LambdaQueryWrapper<T> queryWrapper = queryWrapper();
+
+        this.buildQuery(queryWrapper, pageQuery);
+        // 分页查询
+        IPage<T> pageParam = new Page<>(pageQuery.getPageNum(), pageQuery.getPageSize());
+        IPage<T> result = super.page(pageParam, queryWrapper);
+
+        // 转换为域对象
+        List<B> depts = result.getRecords().stream()
+                .map(this::convertToDomain)
+                .collect(Collectors.toList());
+
+        // 构建分页结果
+        return PageInfo.<B>builder()
+                .page(pageQuery.getPageNum())
+                .pageSize(pageQuery.getPageSize())
+                .total(result.getTotal())
+                .records(depts)
+                .build();
+    }
+
+    protected abstract void buildQuery(LambdaQueryWrapper<T> queryWrapper, Q pageQuery);
 
     /**
      * 初始化转换器实例

@@ -1,9 +1,6 @@
 package org.easywork.console.infra.repository;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.easywork.common.rest.result.PageInfo;
 import org.easywork.console.domain.model.Menu;
 import org.easywork.console.domain.model.dto.MenuQuery;
 import org.easywork.console.domain.repository.MenuRepository;
@@ -18,7 +15,6 @@ import org.springframework.util.StringUtils;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * 菜单仓储实现类
@@ -87,7 +83,6 @@ public class MenuRepositoryImpl extends BaseRepositoryImpl<MenuMapper, MenuPO, M
      * 菜单查询没有特殊逻辑，可以直接使用基类实现
      */
     // findById 方法已由基类 BaseRepositoryImpl 提供
-
     @Override
     public Optional<Menu> findByCode(String code) {
         if (!StringUtils.hasText(code)) {
@@ -192,9 +187,7 @@ public class MenuRepositoryImpl extends BaseRepositoryImpl<MenuMapper, MenuPO, M
     }
 
     @Override
-    public PageInfo<Menu> findByPage(MenuQuery query) {
-        LambdaQueryWrapper<MenuPO> queryWrapper = super.queryWrapper();
-        
+    protected void buildQuery(LambdaQueryWrapper<MenuPO> queryWrapper, MenuQuery query) {
         // 关键字搜索：菜单名称、菜单代码、路由路径
         String keyword = query.getKeyword();
         if (StringUtils.hasText(keyword)) {
@@ -204,44 +197,32 @@ public class MenuRepositoryImpl extends BaseRepositoryImpl<MenuMapper, MenuPO, M
                     .or().like(MenuPO::getRoutePath, keyword)
             );
         }
-        
+
         // 按菜单类型过滤（可选）
         Integer type = query.getType();
         if (type != null) {
             queryWrapper.eq(MenuPO::getType, type);
         }
-        
+
         // 按菜单状态过滤（可选）
         Integer status = query.getStatus();
         if (status != null) {
             queryWrapper.eq(MenuPO::getStatus, status);
         }
-        
+
         // 按可见性过滤（可选）
         Integer visible = query.getVisible();
         if (visible != null) {
             queryWrapper.eq(MenuPO::getVisible, visible);
         }
-        
+
         // 按层级和排序号排序，再按创建时间降序
         queryWrapper.orderByAsc(MenuPO::getLevel, MenuPO::getSort)
-                    .orderByDesc(MenuPO::getCreateTime);
-        
-        // 分页查询
-        IPage<MenuPO> pageParam = new Page<>(query.getPageNum(), query.getPageSize());
-        IPage<MenuPO> result = super.page(pageParam, queryWrapper);
-        
-        // 转换为域对象
-        List<Menu> menus = result.getRecords().stream()
-                .map(MenuConverter.INSTANCE::toDomain)
-                .collect(Collectors.toList());
-        
-        // 构建分页结果
-        return PageInfo.<Menu>builder()
-                .page(query.getPageNum())
-                .pageSize(query.getPageSize())
-                .total(result.getTotal())
-                .records(menus)
-                .build();
+                .orderByDesc(MenuPO::getCreateTime);
+    }
+
+    @Override
+    public long count(MenuQuery query) {
+        return 0;
     }
 }

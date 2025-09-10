@@ -56,4 +56,11 @@ public interface BaseRepository<B extends BaseEntity, Q extends PageQuery> {
      * @return 分页数据
      */
     PageInfo<B> findByPage(Q query);
+
+    /**
+     * 统计数量
+     * @param query 查询参数
+     * @return 总数
+     */
+    long count(Q query);
 }
