@@ -31,6 +31,7 @@
         <hutool.version>5.8.16</hutool.version>
         <mybatis-plus.version>3.5.13</mybatis-plus.version>
         <mapstruct.version>1.6.3</mapstruct.version>
+        <springdoc.version>2.8.13</springdoc.version>
         <easywork.version>1.0.0-SNAPSHOT</easywork.version>
     </properties>
 
@@ -114,9 +115,24 @@
                 <version>${mybatis-plus.version}</version>
             </dependency>
             <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-extension</artifactId>
+                <version>${mybatis-plus.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-jsqlparser</artifactId>
+                <version>${mybatis-plus.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.mapstruct</groupId>
                 <artifactId>mapstruct</artifactId>
                 <version>${mapstruct.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+                <version>${springdoc.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
