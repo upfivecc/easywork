@@ -2,6 +2,7 @@ package org.easywork.console.infra.repository;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.easywork.console.domain.model.Role;
@@ -24,23 +25,13 @@ import java.util.Optional;
  * @date 2025/09/09
  */
 @Repository
-public class RoleRepositoryImpl extends ServiceImpl<RoleMapper, RolePO> implements RoleRepository {
+public class RoleRepositoryImpl extends BaseRepositoryImpl<RoleMapper, RolePO> implements RoleRepository {
 
     @Override
     public Role save(Role role) {
         RolePO rolePO = RoleConverter.INSTANCE.toRepository(role);
-        if (rolePO.getId() == null) {
-            // 新增操作
-            rolePO.setCreateTime(LocalDateTime.now());
-            rolePO.setDeleted(0);
-            rolePO.setVersion(0);
-            super.save(rolePO);
-        } else {
-            // 更新操作
-            rolePO.setUpdateTime(LocalDateTime.now());
-            super.updateById(rolePO);
-        }
-        return RoleConverter.INSTANCE.toDomain(rolePO);
+        RolePO savedPo = savePo(rolePO);
+        return RoleConverter.INSTANCE.toDomain(savedPo);
     }
 
     @Override
@@ -63,7 +54,7 @@ public class RoleRepositoryImpl extends ServiceImpl<RoleMapper, RolePO> implemen
             return Optional.empty();
         }
 
-        LambdaQueryWrapper<RolePO> queryWrapper = new LambdaQueryWrapper<>();
+        LambdaQueryWrapper<RolePO> queryWrapper = Wrappers.lambdaQuery(RolePO.class);
         queryWrapper.eq(RolePO::getCode, code)
                 .eq(RolePO::getDeleted, 0);
 
@@ -73,7 +64,7 @@ public class RoleRepositoryImpl extends ServiceImpl<RoleMapper, RolePO> implemen
 
     @Override
     public List<Role> findByPage(int page, int size, String keyword) {
-        LambdaQueryWrapper<RolePO> queryWrapper = new LambdaQueryWrapper<>();
+        LambdaQueryWrapper<RolePO> queryWrapper = Wrappers.lambdaQuery(RolePO.class);
         queryWrapper.eq(RolePO::getDeleted, 0);
 
         if (StringUtils.hasText(keyword)) {
@@ -95,7 +86,7 @@ public class RoleRepositoryImpl extends ServiceImpl<RoleMapper, RolePO> implemen
 
     @Override
     public long count(String keyword) {
-        LambdaQueryWrapper<RolePO> queryWrapper = new LambdaQueryWrapper<>();
+        LambdaQueryWrapper<RolePO> queryWrapper = Wrappers.lambdaQuery(RolePO.class);
         queryWrapper.eq(RolePO::getDeleted, 0);
 
         if (StringUtils.hasText(keyword)) {
@@ -111,7 +102,7 @@ public class RoleRepositoryImpl extends ServiceImpl<RoleMapper, RolePO> implemen
 
     @Override
     public List<Role> findAllEnabled() {
-        LambdaQueryWrapper<RolePO> queryWrapper = new LambdaQueryWrapper<>();
+        LambdaQueryWrapper<RolePO> queryWrapper = Wrappers.lambdaQuery(RolePO.class);
         queryWrapper.eq(RolePO::getStatus, 1)
                 .eq(RolePO::getDeleted, 0)
                 .orderByAsc(RolePO::getSort)
@@ -135,7 +126,7 @@ public class RoleRepositoryImpl extends ServiceImpl<RoleMapper, RolePO> implemen
             return false;
         }
 
-        LambdaQueryWrapper<RolePO> queryWrapper = new LambdaQueryWrapper<>();
+        LambdaQueryWrapper<RolePO> queryWrapper = Wrappers.lambdaQuery(RolePO.class);
         queryWrapper.eq(RolePO::getCode, code)
                 .eq(RolePO::getDeleted, 0);
 
@@ -144,17 +135,7 @@ public class RoleRepositoryImpl extends ServiceImpl<RoleMapper, RolePO> implemen
 
     @Override
     public void deleteById(Long id) {
-        if (id == null) {
-            return;
-        }
-
-        // 逻辑删除
-        RolePO rolePO = new RolePO();
-        rolePO.setId(id);
-        rolePO.setDeleted(1);
-        rolePO.setUpdateTime(LocalDateTime.now());
-
-        super.updateById(rolePO);
+        this.logicalDeleteById(id);
     }
 
     @Override
@@ -164,7 +145,7 @@ public class RoleRepositoryImpl extends ServiceImpl<RoleMapper, RolePO> implemen
         }
 
         // 批量逻辑删除
-        LambdaQueryWrapper<RolePO> queryWrapper = new LambdaQueryWrapper<>();
+        LambdaQueryWrapper<RolePO> queryWrapper = Wrappers.lambdaQuery(RolePO.class);
         queryWrapper.in(RolePO::getId, ids);
 
         RolePO updateEntity = new RolePO();

@@ -19,13 +19,7 @@ import java.util.List;
 public interface RoleMapper extends BaseMapper<RolePO> {
     
     /**
-     * 根据角色代码查询角色
-     */
-    @Select("SELECT * FROM sys_role WHERE code = #{code} AND deleted = 0 LIMIT 1")
-    RolePO selectByCode(@Param("code") String code);
-    
-    /**
-     * 根据用户ID查找角色
+     * 根据用户ID查找角色（复杂关联查询）
      */
     @Select("""  
         SELECT r.* FROM sys_role r 

@@ -3,7 +3,7 @@ package org.easywork.console.infra.repository.po;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.easywork.console.domain.model.base.TreeNode;
+import org.easywork.console.infra.repository.po.base.BasePO;
 
 /**
  * 权限实体
@@ -15,7 +15,7 @@ import org.easywork.console.domain.model.base.TreeNode;
 @TableName(value = "sys_permission")
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class PermissionPO extends TreeNode<PermissionPO> {
+public class PermissionPO extends BasePO {
 
     /**
      * 权限名称
@@ -61,5 +61,25 @@ public class PermissionPO extends TreeNode<PermissionPO> {
      * 备注
      */
     private String remark;
+
+    /**
+     * 父节点ID
+     */
+    private Long parentId;
+
+    /**
+     * 节点层级
+     */
+    private Integer level;
+
+    /**
+     * 排序号
+     */
+    private Integer sort;
+
+    /**
+     * 路径（用于快速查询子树）
+     */
+    private String path;
 
 }

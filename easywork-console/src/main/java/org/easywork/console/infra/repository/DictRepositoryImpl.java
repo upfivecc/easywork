@@ -3,8 +3,8 @@ package org.easywork.console.infra.repository;
 import cn.hutool.core.lang.Dict;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.easywork.console.domain.repository.DictRepository;
 import org.easywork.console.infra.repository.converter.DictConverter;
 import org.easywork.console.infra.repository.mapper.DictMapper;
@@ -19,29 +19,20 @@ import java.util.stream.Collectors;
 
 /**
  * 字典仓储实现类
- * 
+ *
  * @author fiveupup
  * @version 1.0.0
  * @date 2025/09/09
  */
 @Repository
-public class DictRepositoryImpl extends ServiceImpl<DictMapper, DictPO> implements DictRepository {
+public class DictRepositoryImpl extends BaseRepositoryImpl<DictMapper, DictPO> implements DictRepository {
 
     @Override
     public Dict save(Dict dict) {
         DictPO dictPO = DictConverter.INSTANCE.toRepository(dict);
-        if (dictPO.getId() == null) {
-            // 新增操作
-            dictPO.setCreateTime(LocalDateTime.now());
-            dictPO.setDeleted(0);
-            dictPO.setVersion(0);
-            super.save(dictPO);
-        } else {
-            // 更新操作
-            dictPO.setUpdateTime(LocalDateTime.now());
-            super.updateById(dictPO);
-        }
-        return DictConverter.INSTANCE.toDomain(dictPO);
+        // 使用基类的通用保存方法
+        DictPO savedPO = savePo(dictPO);
+        return DictConverter.INSTANCE.toDomain(savedPO);
     }
 
     @Override
@@ -49,11 +40,11 @@ public class DictRepositoryImpl extends ServiceImpl<DictMapper, DictPO> implemen
         if (id == null) {
             return Optional.empty();
         }
-        
-        LambdaQueryWrapper<DictPO> queryWrapper = new LambdaQueryWrapper<>();
+
+        LambdaQueryWrapper<DictPO> queryWrapper = Wrappers.lambdaQuery(DictPO.class);
         queryWrapper.eq(DictPO::getId, id)
-                   .eq(DictPO::getDeleted, 0);
-        
+                .eq(DictPO::getDeleted, 0);
+
         DictPO dictPO = super.getOne(queryWrapper);
         return Optional.ofNullable(DictConverter.INSTANCE.toDomain(dictPO));
     }
@@ -63,20 +54,20 @@ public class DictRepositoryImpl extends ServiceImpl<DictMapper, DictPO> implemen
         if (!StringUtils.hasText(code)) {
             return Optional.empty();
         }
-        
-        LambdaQueryWrapper<DictPO> queryWrapper = new LambdaQueryWrapper<>();
+
+        LambdaQueryWrapper<DictPO> queryWrapper = Wrappers.lambdaQuery(DictPO.class);
         queryWrapper.eq(DictPO::getCode, code)
-                   .eq(DictPO::getDeleted, 0);
-        
+                .eq(DictPO::getDeleted, 0);
+
         DictPO dictPO = super.getOne(queryWrapper);
         return Optional.ofNullable(DictConverter.INSTANCE.toDomain(dictPO));
     }
 
     @Override
     public List<Dict> findByPage(int page, int size, String keyword) {
-        LambdaQueryWrapper<DictPO> queryWrapper = new LambdaQueryWrapper<>();
+        LambdaQueryWrapper<DictPO> queryWrapper = Wrappers.lambdaQuery(DictPO.class);
         queryWrapper.eq(DictPO::getDeleted, 0);
-        
+
         if (StringUtils.hasText(keyword)) {
             queryWrapper.and(wrapper -> wrapper
                     .like(DictPO::getName, keyword)
@@ -84,21 +75,21 @@ public class DictRepositoryImpl extends ServiceImpl<DictMapper, DictPO> implemen
                     .or().like(DictPO::getDescription, keyword)
             );
         }
-        
+
         queryWrapper.orderByAsc(DictPO::getSort)
-                   .orderByDesc(DictPO::getCreateTime);
-        
+                .orderByDesc(DictPO::getCreateTime);
+
         IPage<DictPO> pageParam = new Page<>(page, size);
         IPage<DictPO> result = super.page(pageParam, queryWrapper);
-        
+
         return result.getRecords().stream().map(DictConverter.INSTANCE::toDomain).collect(Collectors.toList());
     }
 
     @Override
     public long count(String keyword) {
-        LambdaQueryWrapper<DictPO> queryWrapper = new LambdaQueryWrapper<>();
+        LambdaQueryWrapper<DictPO> queryWrapper = Wrappers.lambdaQuery(DictPO.class);
         queryWrapper.eq(DictPO::getDeleted, 0);
-        
+
         if (StringUtils.hasText(keyword)) {
             queryWrapper.and(wrapper -> wrapper
                     .like(DictPO::getName, keyword)
@@ -106,18 +97,18 @@ public class DictRepositoryImpl extends ServiceImpl<DictMapper, DictPO> implemen
                     .or().like(DictPO::getDescription, keyword)
             );
         }
-        
+
         return super.count(queryWrapper);
     }
 
     @Override
     public List<Dict> findAllEnabled() {
-        LambdaQueryWrapper<DictPO> queryWrapper = new LambdaQueryWrapper<>();
+        LambdaQueryWrapper<DictPO> queryWrapper = Wrappers.lambdaQuery(DictPO.class);
         queryWrapper.eq(DictPO::getStatus, 1)
-                   .eq(DictPO::getDeleted, 0)
-                   .orderByAsc(DictPO::getSort)
-                   .orderByDesc(DictPO::getCreateTime);
-        
+                .eq(DictPO::getDeleted, 0)
+                .orderByAsc(DictPO::getSort)
+                .orderByDesc(DictPO::getCreateTime);
+
         return super.list(queryWrapper).stream().map(DictConverter.INSTANCE::toDomain).toList();
 
     }
@@ -127,27 +118,18 @@ public class DictRepositoryImpl extends ServiceImpl<DictMapper, DictPO> implemen
         if (!StringUtils.hasText(code)) {
             return false;
         }
-        
-        LambdaQueryWrapper<DictPO> queryWrapper = new LambdaQueryWrapper<>();
+
+        LambdaQueryWrapper<DictPO> queryWrapper = Wrappers.lambdaQuery(DictPO.class);
         queryWrapper.eq(DictPO::getCode, code)
-                   .eq(DictPO::getDeleted, 0);
-        
+                .eq(DictPO::getDeleted, 0);
+
         return super.count(queryWrapper) > 0;
     }
 
     @Override
     public void deleteById(Long id) {
-        if (id == null) {
-            return;
-        }
-        
-        // 逻辑删除
-        DictPO dictPO = new DictPO();
-        dictPO.setId(id);
-        dictPO.setDeleted(1);
-        dictPO.setUpdateTime(LocalDateTime.now());
-        
-        super.updateById(dictPO);
+        // 使用基类的通用逻辑删除方法
+        logicalDeleteById(id);
     }
 
     @Override
@@ -155,15 +137,15 @@ public class DictRepositoryImpl extends ServiceImpl<DictMapper, DictPO> implemen
         if (ids == null || ids.isEmpty()) {
             return;
         }
-        
+
         // 批量逻辑删除
-        LambdaQueryWrapper<DictPO> queryWrapper = new LambdaQueryWrapper<>();
+        LambdaQueryWrapper<DictPO> queryWrapper = Wrappers.lambdaQuery(DictPO.class);
         queryWrapper.in(DictPO::getId, ids);
-        
+
         DictPO updateEntity = new DictPO();
         updateEntity.setDeleted(1);
         updateEntity.setUpdateTime(LocalDateTime.now());
-        
+
         super.update(updateEntity, queryWrapper);
     }
 }

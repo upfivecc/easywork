@@ -19,50 +19,22 @@ import java.util.List;
 public interface DeptMapper extends BaseMapper<DeptPO> {
     
     /**
-     * 根据父ID查询子部门
-     */
-    @Select("SELECT * FROM sys_dept WHERE parent_id = #{parentId} AND deleted = 0 ORDER BY sort ASC")
-    List<DeptPO> selectByParentId(@Param("parentId") Long parentId);
-    
-    /**
-     * 根据部门编码查询部门
-     */
-    @Select("SELECT * FROM sys_dept WHERE code = #{code} AND deleted = 0 LIMIT 1")
-    DeptPO selectByCode(@Param("code") String code);
-    
-    /**
-     * 根据类型查询部门
-     */
-    @Select("SELECT * FROM sys_dept WHERE type = #{type} AND deleted = 0 ORDER BY level ASC, sort ASC")
-    List<DeptPO> selectByType(@Param("type") Integer type);
-    
-    /**
-     * 查询所有启用的部门
-     */
-    @Select("SELECT * FROM sys_dept WHERE status = 1 AND deleted = 0 ORDER BY level ASC, sort ASC")
-    List<DeptPO> selectAllEnabled();
-    
-    /**
-     * 根据负责人ID查询部门
-     */
-    @Select("SELECT * FROM sys_dept WHERE leader_id = #{leaderId} AND deleted = 0")
-    List<DeptPO> selectByLeaderId(@Param("leaderId") Long leaderId);
-    
-    /**
      * 查询指定部门的所有子部门（包括孙部门）
+     * 这是一个复杂的路径匹配查询，适合使用 @Select 注解
+     * 使用 path 字段的 LIKE 查询实现树形结构的子节点查找
      */
-    @Select("SELECT * FROM sys_dept WHERE (path LIKE CONCAT((SELECT path FROM sys_dept WHERE id = #{deptId}), '/%') OR id = #{deptId}) AND deleted = 0")
+    @Select("""
+        SELECT * 
+        FROM sys_dept 
+        WHERE (
+            path LIKE CONCAT(
+                (SELECT path FROM sys_dept WHERE id = #{deptId}), 
+                '/%'
+            ) 
+            OR id = #{deptId}
+        ) 
+        AND deleted = 0
+        ORDER BY level ASC, sort ASC
+        """)
     List<DeptPO> selectAllChildren(@Param("deptId") Long deptId);
-    
-    /**
-     * 检查部门编码是否存在
-     */
-    @Select("SELECT COUNT(1) FROM sys_dept WHERE code = #{code} AND deleted = 0")
-    int countByCode(@Param("code") String code);
-    
-    /**
-     * 检查部门编码是否存在（排除指定ID）
-     */
-    @Select("SELECT COUNT(1) FROM sys_dept WHERE code = #{code} AND id != #{excludeId} AND deleted = 0")
-    int countByCodeExcludeId(@Param("code") String code, @Param("excludeId") Long excludeId);
 }

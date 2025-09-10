@@ -59,3 +59,26 @@ t_dict                    t_dict_item
     └── 客服组 (type=3)                    # 小组级
 ```
 
+### mybatis-plus 使用原则
+
+- 简单查询 → 使用 MyBatis Plus 内置方法
+- 复杂关联 → 使用 @Select 注解或 XML
+- 业务组装 → 在 Repository 实现类中完成
+- 类型安全 → 优先使用 LambdaQueryWrapper
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

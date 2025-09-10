@@ -19,13 +19,7 @@ import java.util.List;
 public interface MenuMapper extends BaseMapper<MenuPO> {
     
     /**
-     * 根据菜单代码查询菜单
-     */
-    @Select("SELECT * FROM sys_menu WHERE code = #{code} AND deleted = 0 LIMIT 1")
-    MenuPO selectByCode(@Param("code") String code);
-    
-    /**
-     * 根据用户ID查找菜单
+     * 根据用户ID查找菜单（复杂关联查询）
      */
     @Select("""  
         SELECT DISTINCT m.* FROM sys_menu m 
@@ -40,7 +34,7 @@ public interface MenuMapper extends BaseMapper<MenuPO> {
     List<MenuPO> selectByUserId(@Param("userId") Long userId);
     
     /**
-     * 根据角色ID查找菜单
+     * 根据角色ID查找菜单（复杂关联查询）
      */
     @Select("""  
         SELECT m.* FROM sys_menu m 

@@ -3,7 +3,7 @@ package org.easywork.console.infra.repository.po;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.easywork.console.domain.model.base.TreeNode;
+import org.easywork.console.infra.repository.po.base.BasePO;
 
 /**
  * 菜单实体
@@ -15,7 +15,7 @@ import org.easywork.console.domain.model.base.TreeNode;
 @TableName(value = "sys_menu")
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class MenuPO extends TreeNode<MenuPO> {
+public class MenuPO extends BasePO {
 
     /**
      * 菜单名称
@@ -36,6 +36,26 @@ public class MenuPO extends TreeNode<MenuPO> {
      * 菜单图标
      */
     private String icon;
+
+    /**
+     * 父节点ID
+     */
+    private Long parentId;
+
+    /**
+     * 节点层级
+     */
+    private Integer level;
+
+    /**
+     * 排序号
+     */
+    private Integer sort;
+
+    /**
+     * 路径（用于快速查询子树）
+     */
+    private String path;
 
     /**
      * 路由路径
@@ -81,5 +101,6 @@ public class MenuPO extends TreeNode<MenuPO> {
      * 备注
      */
     private String remark;
+
 
 }

@@ -19,13 +19,7 @@ import java.util.List;
 public interface PermissionMapper extends BaseMapper<PermissionPO> {
     
     /**
-     * 根据权限代码查询权限
-     */
-    @Select("SELECT * FROM sys_permission WHERE code = #{code} AND deleted = 0 LIMIT 1")
-    PermissionPO selectByCode(@Param("code") String code);
-    
-    /**
-     * 根据用户ID查找权限
+     * 根据用户ID查找权限（复杂关联查询）
      */
     @Select("""  
         SELECT DISTINCT p.* FROM sys_permission p 
@@ -40,7 +34,7 @@ public interface PermissionMapper extends BaseMapper<PermissionPO> {
     List<PermissionPO> selectByUserId(@Param("userId") Long userId);
     
     /**
-     * 根据角色ID查找权限
+     * 根据角色ID查找权限（复杂关联查询）
      */
     @Select("""  
         SELECT p.* FROM sys_permission p 
