@@ -24,9 +24,9 @@ public interface PermissionRepository extends BaseRepository<Permission, Permiss
     List<Permission> findAllAsTree();
 
     /**
-     * 根据父ID查找子权限
+     * 根据父权限编码查找子权限
      */
-    List<Permission> findByParentId(Long parentId);
+    List<Permission> findByParentCode(String parentCode);
 
     /**
      * 根据用户ID查找权限

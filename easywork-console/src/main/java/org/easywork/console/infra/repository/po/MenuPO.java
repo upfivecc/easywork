@@ -1,5 +1,6 @@
 package org.easywork.console.infra.repository.po;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -7,6 +8,7 @@ import org.easywork.console.infra.repository.po.base.BasePO;
 
 /**
  * 菜单实体
+ * 基于 code 进行树形结构关联
  *
  * @author fiveupup
  * @version 1.0.0
@@ -20,41 +22,49 @@ public class MenuPO extends BasePO {
     /**
      * 菜单名称
      */
+    @TableField("name")
     private String name;
 
     /**
      * 菜单代码
      */
+    @TableField("code")
     private String code;
 
     /**
      * 菜单类型 1-目录 2-菜单 3-按钮
      */
+    @TableField("type")
     private Integer type;
 
     /**
      * 菜单图标
      */
+    @TableField("icon")
     private String icon;
 
     /**
-     * 父节点ID
+     * 父菜单编码
      */
-    private Long parentId;
+    @TableField("parent_code")
+    private String parentCode;
 
     /**
      * 节点层级
      */
+    @TableField("level")
     private Integer level;
 
     /**
      * 排序号
      */
+    @TableField("sort")
     private Integer sort;
 
     /**
      * 路径（用于快速查询子树）
      */
+    @TableField("path")
     private String path;
 
     /**

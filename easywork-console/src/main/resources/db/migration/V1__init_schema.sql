@@ -41,7 +41,7 @@ CREATE TABLE sys_user (
 -- 部门表
 CREATE TABLE sys_dept (
     id BIGINT(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-    parent_id BIGINT(20) DEFAULT 0 COMMENT '父部门ID',
+    parent_code VARCHAR(50) COMMENT '父部门编码',
     name VARCHAR(50) NOT NULL COMMENT '部门名称',
     code VARCHAR(50) NOT NULL COMMENT '部门编码',
     type TINYINT(1) DEFAULT 1 COMMENT '部门类型 1-公司 2-部门 3-小组',
@@ -53,7 +53,7 @@ CREATE TABLE sys_dept (
     status TINYINT(1) DEFAULT 1 COMMENT '状态 1-启用 0-禁用',
     level INT(11) DEFAULT 1 COMMENT '部门层级',
     sort INT(11) DEFAULT 0 COMMENT '排序号',
-    path VARCHAR(500) COMMENT '层级路径',
+    path VARCHAR(500) COMMENT '层级路径 格式:父code/父code/当前code',
     remark VARCHAR(500) COMMENT '备注',
     create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     update_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
@@ -63,7 +63,7 @@ CREATE TABLE sys_dept (
     version INT(11) DEFAULT 1 COMMENT '版本号',
     PRIMARY KEY (id),
     UNIQUE KEY uk_code (code),
-    KEY idx_parent_id (parent_id),
+    KEY idx_parent_code (parent_code),
     KEY idx_leader_id (leader_id),
     KEY idx_type (type),
     KEY idx_status (status),
@@ -96,7 +96,7 @@ CREATE TABLE sys_role (
 -- 权限表
 CREATE TABLE sys_permission (
     id BIGINT(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-    parent_id BIGINT(20) DEFAULT 0 COMMENT '父权限ID',
+    parent_code VARCHAR(100) COMMENT '父权限编码',
     name VARCHAR(50) NOT NULL COMMENT '权限名称',
     code VARCHAR(100) NOT NULL COMMENT '权限代码',
     type TINYINT(1) NOT NULL COMMENT '权限类型 1-菜单 2-按钮 3-API',
@@ -107,7 +107,7 @@ CREATE TABLE sys_permission (
     icon VARCHAR(100) COMMENT '图标',
     level INT(11) DEFAULT 1 COMMENT '层级',
     sort INT(11) DEFAULT 0 COMMENT '排序号',
-    path VARCHAR(500) COMMENT '路径',
+    path VARCHAR(500) COMMENT '路径 格式:父code/父code/当前code',
     remark VARCHAR(500) COMMENT '备注',
     create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     update_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
@@ -117,7 +117,7 @@ CREATE TABLE sys_permission (
     version INT(11) DEFAULT 1 COMMENT '版本号',
     PRIMARY KEY (id),
     UNIQUE KEY uk_code (code),
-    KEY idx_parent_id (parent_id),
+    KEY idx_parent_code (parent_code),
     KEY idx_type (type),
     KEY idx_status (status),
     KEY idx_sort (sort)
@@ -126,14 +126,14 @@ CREATE TABLE sys_permission (
 -- 菜单表
 CREATE TABLE sys_menu (
     id BIGINT(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-    parent_id BIGINT(20) DEFAULT 0 COMMENT '父菜单ID',
+    parent_code VARCHAR(50) COMMENT '父菜单编码',
     name VARCHAR(50) NOT NULL COMMENT '菜单名称',
     code VARCHAR(50) NOT NULL COMMENT '菜单代码',
     type TINYINT(1) NOT NULL COMMENT '菜单类型 1-目录 2-菜单 3-按钮',
     icon VARCHAR(100) COMMENT '菜单图标',
     route_path VARCHAR(200) COMMENT '路由路径',
     component VARCHAR(200) COMMENT '组件路径',
-    permissionPO VARCHAR(100) COMMENT '权限标识',
+    permission VARCHAR(100) COMMENT '权限标识',
     visible TINYINT(1) DEFAULT 1 COMMENT '状态 1-显示 0-隐藏',
     status TINYINT(1) DEFAULT 1 COMMENT '状态 1-启用 0-禁用',
     cache TINYINT(1) DEFAULT 0 COMMENT '是否缓存 1-缓存 0-不缓存',
@@ -141,7 +141,7 @@ CREATE TABLE sys_menu (
     external_url VARCHAR(500) COMMENT '外链地址',
     level INT(11) DEFAULT 1 COMMENT '层级',
     sort INT(11) DEFAULT 0 COMMENT '排序号',
-    path VARCHAR(500) COMMENT '路径',
+    path VARCHAR(500) COMMENT '路径 格式:父code/父code/当前code',
     remark VARCHAR(500) COMMENT '备注',
     create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     update_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
@@ -151,7 +151,7 @@ CREATE TABLE sys_menu (
     version INT(11) DEFAULT 1 COMMENT '版本号',
     PRIMARY KEY (id),
     UNIQUE KEY uk_code (code),
-    KEY idx_parent_id (parent_id),
+    KEY idx_parent_code (parent_code),
     KEY idx_type (type),
     KEY idx_visible (visible),
     KEY idx_status (status),
@@ -331,3 +331,40 @@ CREATE TABLE sys_file_info (
     KEY idx_business_id (business_id),
     KEY idx_status (status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='文件信息表';
+
+-- 初始化示例数据（基于code的树形结构）
+
+-- 部门数据
+INSERT INTO sys_dept (parent_code, name, code, type, status, level, sort, path, remark) VALUES
+(NULL, '总公司', 'company', 1, 1, 1, 1, 'company', '总公司'),
+('company', '技术中心', 'tech', 2, 1, 2, 1, 'company/tech', '技术研发中心'),
+('company', '产品中心', 'product', 2, 1, 2, 2, 'company/product', '产品管理中心'),
+('company', '运营中心', 'operation', 2, 1, 2, 3, 'company/operation', '运营管理中心'),
+('tech', '前端开发组', 'frontend', 3, 1, 3, 1, 'company/tech/frontend', '前端开发团队'),
+('tech', '后端开发组', 'backend', 3, 1, 3, 2, 'company/tech/backend', '后端开发团队'),
+('tech', '测试组', 'test', 3, 1, 3, 3, 'company/tech/test', '软件测试团队'),
+('product', 'UI设计组', 'ui', 3, 1, 3, 1, 'company/product/ui', 'UI/UX设计团队'),
+('product', '产品管理组', 'pm', 3, 1, 3, 2, 'company/product/pm', '产品管理团队');
+
+-- 菜单数据
+INSERT INTO sys_menu (parent_code, name, code, type, icon, route_path, component, visible, status, level, sort, path, remark) VALUES
+(NULL, '系统管理', 'system', 1, 'setting', '/system', NULL, 1, 1, 1, 1, 'system', '系统管理目录'),
+('system', '用户管理', 'user_mgmt', 2, 'user', '/system/user', 'system/user/index', 1, 1, 2, 1, 'system/user_mgmt', '用户管理菜单'),
+('system', '部门管理', 'dept_mgmt', 2, 'tree', '/system/dept', 'system/dept/index', 1, 1, 2, 2, 'system/dept_mgmt', '部门管理菜单'),
+('system', '角色管理', 'role_mgmt', 2, 'peoples', '/system/role', 'system/role/index', 1, 1, 2, 3, 'system/role_mgmt', '角色管理菜单'),
+('system', '菜单管理', 'menu_mgmt', 2, 'tree-table', '/system/menu', 'system/menu/index', 1, 1, 2, 4, 'system/menu_mgmt', '菜单管理菜单'),
+('user_mgmt', '新增用户', 'user_add', 3, NULL, NULL, NULL, 0, 1, 3, 1, 'system/user_mgmt/user_add', '新增用户按钮'),
+('user_mgmt', '编辑用户', 'user_edit', 3, NULL, NULL, NULL, 0, 1, 3, 2, 'system/user_mgmt/user_edit', '编辑用户按钮'),
+('user_mgmt', '删除用户', 'user_delete', 3, NULL, NULL, NULL, 0, 1, 3, 3, 'system/user_mgmt/user_delete', '删除用户按钮');
+
+-- 权限数据
+INSERT INTO sys_permission (parent_code, name, code, type, description, resource, method, status, level, sort, path, remark) VALUES
+(NULL, '系统管理', 'sys', 1, '系统管理模块', '/system', 'GET', 1, 1, 1, 'sys', '系统管理模块权限'),
+('sys', '用户管理', 'sys:user', 1, '用户管理模块', '/system/user', 'GET', 1, 2, 1, 'sys/sys:user', '用户管理模块权限'),
+('sys:user', '查询用户', 'sys:user:query', 3, '查询用户列表', '/api/users', 'GET', 1, 3, 1, 'sys/sys:user/sys:user:query', '查询用户权限'),
+('sys:user', '新增用户', 'sys:user:add', 3, '新增用户', '/api/users', 'POST', 1, 3, 2, 'sys/sys:user/sys:user:add', '新增用户权限'),
+('sys:user', '编辑用户', 'sys:user:edit', 3, '编辑用户', '/api/users/*', 'PUT', 1, 3, 3, 'sys/sys:user/sys:user:edit', '编辑用户权限'),
+('sys:user', '删除用户', 'sys:user:delete', 3, '删除用户', '/api/users/*', 'DELETE', 1, 3, 4, 'sys/sys:user/sys:user:delete', '删除用户权限'),
+('sys', '部门管理', 'sys:dept', 1, '部门管理模块', '/system/dept', 'GET', 1, 2, 2, 'sys/sys:dept', '部门管理模块权限'),
+('sys:dept', '查询部门', 'sys:dept:query', 3, '查询部门列表', '/api/depts', 'GET', 1, 3, 1, 'sys/sys:dept/sys:dept:query', '查询部门权限'),
+('sys:dept', '新增部门', 'sys:dept:add', 3, '新增部门', '/api/depts', 'POST', 1, 3, 2, 'sys/sys:dept/sys:dept:add', '新增部门权限');

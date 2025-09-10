@@ -40,36 +40,24 @@ public class MenuRepositoryImpl extends BaseRepositoryImpl<MenuMapper, MenuPO, M
             menuPO.setDeleted(0);
             menuPO.setVersion(0);
 
-            // 设置层级和路径
-            if (menuPO.getParentId() != null && menuPO.getParentId() != 0) {
-                Optional<Menu> parent = findById(menuPO.getParentId());
+            // 设置层级和路径（基于 parentCode）
+            if (StringUtils.hasText(menuPO.getParentCode())) {
+                Optional<Menu> parent = findByCode(menuPO.getParentCode());
                 if (parent.isPresent()) {
                     Menu parentBO = parent.get();
                     menuPO.setLevel(parentBO.getLevel() + 1);
-                    menuPO.setPath(parentBO.getPath() + "/" + menuPO.getId());
+                    menuPO.setPath(parentBO.getPath() + "/" + menuPO.getCode());
                 } else {
                     menuPO.setLevel(1);
-                    menuPO.setPath("/" + menuPO.getId());
+                    menuPO.setPath(menuPO.getCode());
                 }
             } else {
                 menuPO.setLevel(1);
-                menuPO.setParentId(0L);
-                menuPO.setPath("/" + menuPO.getId());
+                menuPO.setParentCode(null);
+                menuPO.setPath(menuPO.getCode());
             }
 
             super.save(menuPO);
-
-            // 保存后更新路径（因为需要实际的ID）
-            if (menuPO.getParentId() != null && menuPO.getParentId() != 0) {
-                Optional<Menu> parent = findById(menuPO.getParentId());
-                if (parent.isPresent()) {
-                    menuPO.setPath(parent.get().getPath() + "/" + menuPO.getId());
-                    super.updateById(menuPO);
-                }
-            } else {
-                menuPO.setPath("/" + menuPO.getId());
-                super.updateById(menuPO);
-            }
         } else {
             // 更新操作
             menuPO.setUpdateTime(LocalDateTime.now());
@@ -104,14 +92,22 @@ public class MenuRepositoryImpl extends BaseRepositoryImpl<MenuMapper, MenuPO, M
                 .orderByDesc(MenuPO::getCreateTime);
 
         List<MenuPO> allMenus = super.list(queryWrapper);
-        return TreeUtils.buildTree(allMenus.stream().map(MenuConverter.INSTANCE::toDomain).toList(), 0L);
+        return TreeUtils.buildTree(allMenus.stream().map(MenuConverter.INSTANCE::toDomain).toList(), (String) null);
     }
 
     @Override
-    public List<Menu> findByParentId(Long parentId) {
+    public List<Menu> findByParentCode(String parentCode) {
         LambdaQueryWrapper<MenuPO> queryWrapper = super.queryWrapper();
-        queryWrapper.eq(MenuPO::getParentId, parentId != null ? parentId : 0)
-                .orderByAsc(MenuPO::getSort)
+        if (!StringUtils.hasText(parentCode)) {
+            queryWrapper.and(wrapper -> wrapper
+                    .isNull(MenuPO::getParentCode)
+                    .or().eq(MenuPO::getParentCode, "")
+                    .or().eq(MenuPO::getParentCode, "0")
+            );
+        } else {
+            queryWrapper.eq(MenuPO::getParentCode, parentCode);
+        }
+        queryWrapper.orderByAsc(MenuPO::getSort)
                 .orderByDesc(MenuPO::getCreateTime);
 
         return super.list(queryWrapper).stream().map(MenuConverter.INSTANCE::toDomain).toList();
@@ -159,7 +155,7 @@ public class MenuRepositoryImpl extends BaseRepositoryImpl<MenuMapper, MenuPO, M
                 .orderByDesc(MenuPO::getCreateTime);
 
         List<MenuPO> allMenus = super.list(queryWrapper);
-        return TreeUtils.buildTree(allMenus.stream().map(MenuConverter.INSTANCE::toDomain).toList(), 0L);
+        return TreeUtils.buildTree(allMenus.stream().map(MenuConverter.INSTANCE::toDomain).toList(), (String) null);
     }
 
     @Override
@@ -171,7 +167,7 @@ public class MenuRepositoryImpl extends BaseRepositoryImpl<MenuMapper, MenuPO, M
                 .orderByDesc(MenuPO::getCreateTime);
 
         List<MenuPO> allMenus = super.list(queryWrapper);
-        return TreeUtils.buildTree(allMenus.stream().map(MenuConverter.INSTANCE::toDomain).toList(), 0L);
+        return TreeUtils.buildTree(allMenus.stream().map(MenuConverter.INSTANCE::toDomain).toList(), (String) null);
     }
 
     @Override

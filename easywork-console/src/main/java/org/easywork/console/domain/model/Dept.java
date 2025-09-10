@@ -8,6 +8,7 @@ import java.util.List;
 
 /**
  * 部门实体
+ * 基于 code 进行树形结构关联
  *
  * @author fiveupup
  * @version 1.0.0
@@ -18,9 +19,9 @@ import java.util.List;
 public class Dept extends TreeNode<Dept> {
 
     /**
-     * 父部门ID
+     * 父部门编码
      */
-    private Long parentId;
+    private String parentCode;
 
     /**
      * 部门名称
@@ -66,21 +67,6 @@ public class Dept extends TreeNode<Dept> {
      * 状态 1-启用 0-禁用
      */
     private Integer status;
-
-    /**
-     * 部门层级
-     */
-    private Integer level;
-
-    /**
-     * 排序号
-     */
-    private Integer sort;
-
-    /**
-     * 层级路径
-     */
-    private String path;
 
     /**
      * 子部门列表

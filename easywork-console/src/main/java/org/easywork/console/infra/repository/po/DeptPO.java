@@ -8,6 +8,7 @@ import org.easywork.console.infra.repository.po.base.BasePO;
 
 /**
  * 部门持久化对象
+ * 基于 code 进行树形结构关联
  * 
  * @author fiveupup
  * @version 1.0.0
@@ -19,10 +20,10 @@ import org.easywork.console.infra.repository.po.base.BasePO;
 public class DeptPO extends BasePO {
     
     /**
-     * 父部门ID
+     * 父部门编码
      */
-    @TableField("parent_id")
-    private Long parentId;
+    @TableField("parent_code")
+    private String parentCode;
     
     /**
      * 部门名称

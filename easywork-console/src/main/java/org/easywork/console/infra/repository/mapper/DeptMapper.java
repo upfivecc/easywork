@@ -10,6 +10,7 @@ import java.util.List;
 
 /**
  * 部门Mapper接口
+ * 基于 code 的树形结构查询
  * 
  * @author fiveupup
  * @version 1.0.0
@@ -19,22 +20,21 @@ import java.util.List;
 public interface DeptMapper extends BaseMapper<DeptPO> {
     
     /**
-     * 查询指定部门的所有子部门（包括孙部门）
-     * 这是一个复杂的路径匹配查询，适合使用 @Select 注解
-     * 使用 path 字段的 LIKE 查询实现树形结构的子节点查找
+     * 根据部门编码查询所有子部门（包括孙部门）
+     * 基于 code 的树形结构查询
      */
     @Select("""
         SELECT * 
         FROM sys_dept 
         WHERE (
             path LIKE CONCAT(
-                (SELECT path FROM sys_dept WHERE id = #{deptId}), 
+                (SELECT path FROM sys_dept WHERE code = #{deptCode} AND deleted = 0), 
                 '/%'
             ) 
-            OR id = #{deptId}
+            OR code = #{deptCode}
         ) 
         AND deleted = 0
         ORDER BY level ASC, sort ASC
         """)
-    List<DeptPO> selectAllChildren(@Param("deptId") Long deptId);
+    List<DeptPO> selectAllChildrenByCode(@Param("deptCode") String deptCode);
 }

@@ -28,9 +28,14 @@ public interface DeptRepository extends BaseRepository<Dept, DeptQuery> {
     List<Dept> findAllAsTree();
 
     /**
-     * 根据父ID查找子部门
+     * 根据父部门编码查找子部门
      */
-    List<Dept> findByParentId(Long parentId);
+    List<Dept> findByParentCode(String parentCode);
+
+    /**
+     * 查找指定部门的所有子部门编码（包括孙部门）
+     */
+    List<String> findAllChildrenCodes(String deptCode);
 
     /**
      * 根据类型查找部门
@@ -51,11 +56,6 @@ public interface DeptRepository extends BaseRepository<Dept, DeptQuery> {
      * 检查部门编码是否存在
      */
     boolean existsByCode(String code);
-
-    /**
-     * 查找指定部门的所有子部门ID（包括孙部门）
-     */
-    List<Long> findAllChildrenIds(Long deptId);
 
     /**
      * 查找指定用户数据权限范围内的部门

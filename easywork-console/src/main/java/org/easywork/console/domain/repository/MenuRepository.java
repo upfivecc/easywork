@@ -25,9 +25,9 @@ public interface MenuRepository extends BaseRepository<Menu, MenuQuery> {
     List<Menu> findAllAsTree();
 
     /**
-     * 根据父ID查找子菜单
+     * 根据父菜单编码查找子菜单
      */
-    List<Menu> findByParentId(Long parentId);
+    List<Menu> findByParentCode(String parentCode);
 
     /**
      * 根据用户ID查找菜单

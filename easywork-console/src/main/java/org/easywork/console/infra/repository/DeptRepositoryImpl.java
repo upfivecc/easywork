@@ -14,6 +14,7 @@ import org.easywork.console.infra.repository.po.DeptPO;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -31,6 +32,46 @@ import java.util.stream.Collectors;
 public class DeptRepositoryImpl extends BaseRepositoryImpl<DeptMapper, DeptPO, Dept, DeptQuery> implements DeptRepository {
 
     private final DeptMapper deptMapper;
+
+    /**
+     * 菜单持久化方法 - 包含特殊的层级和路径处理逻辑
+     * 重写基类方法以处理菜单特有的业务逻辑
+     */
+    @Override
+    public Dept persist(Dept menu) {
+        DeptPO deptPO = DeptConverter.INSTANCE.toRepository(menu);
+
+        if (deptPO.getId() == null) {
+            // 新增操作
+            deptPO.setCreateTime(LocalDateTime.now());
+            deptPO.setDeleted(0);
+            deptPO.setVersion(0);
+
+            // 设置层级和路径（基于 parentCode）
+            if (StringUtils.hasText(deptPO.getParentCode())) {
+                Optional<Dept> parent = findByCode(deptPO.getParentCode());
+                if (parent.isPresent()) {
+                    Dept deptBO = parent.get();
+                    deptPO.setLevel(deptBO.getLevel() + 1);
+                    deptPO.setPath(deptPO.getPath() + "/" + deptPO.getCode());
+                } else {
+                    deptPO.setLevel(1);
+                    deptPO.setPath(deptPO.getCode());
+                }
+            } else {
+                deptPO.setLevel(1);
+                deptPO.setParentCode(null);
+                deptPO.setPath(deptPO.getCode());
+            }
+
+            super.save(deptPO);
+        } else {
+            // 更新操作
+            deptPO.setUpdateTime(LocalDateTime.now());
+            super.updateById(deptPO);
+        }
+        return DeptConverter.INSTANCE.toDomain(deptPO);
+    }
 
     @Override
     public Optional<Dept> findByCode(String code) {
@@ -52,14 +93,22 @@ public class DeptRepositoryImpl extends BaseRepositoryImpl<DeptMapper, DeptPO, D
                 .map(DeptConverter.INSTANCE::toDomain)
                 .collect(Collectors.toList());
 
-        return TreeUtils.buildTree(depts, 0L);
+        return TreeUtils.buildTree(depts, (String) null);
     }
 
     @Override
-    public List<Dept> findByParentId(Long parentId) {
+    public List<Dept> findByParentCode(String parentCode) {
         LambdaQueryWrapper<DeptPO> queryWrapper = super.queryWrapper();
-        queryWrapper.eq(DeptPO::getParentId, parentId)
-                .orderByAsc(DeptPO::getSort);
+        if (parentCode == null || parentCode.isEmpty() || "0".equals(parentCode)) {
+            queryWrapper.and(wrapper -> wrapper
+                    .isNull(DeptPO::getParentCode)
+                    .or().eq(DeptPO::getParentCode, "")
+                    .or().eq(DeptPO::getParentCode, "0")
+            );
+        } else {
+            queryWrapper.eq(DeptPO::getParentCode, parentCode);
+        }
+        queryWrapper.orderByAsc(DeptPO::getSort);
         List<DeptPO> deptPOs = deptMapper.selectList(queryWrapper);
         return deptPOs.stream()
                 .map(DeptConverter.INSTANCE::toDomain)
@@ -135,10 +184,11 @@ public class DeptRepositoryImpl extends BaseRepositoryImpl<DeptMapper, DeptPO, D
     }
 
     @Override
-    public List<Long> findAllChildrenIds(Long deptId) {
-        List<DeptPO> children = deptMapper.selectAllChildren(deptId);
+    public List<String> findAllChildrenCodes(String deptCode) {
+        // 基于 code 的新方法，使用专门的 Mapper 方法
+        List<DeptPO> children = deptMapper.selectAllChildrenByCode(deptCode);
         return children.stream()
-                .map(DeptPO::getId)
+                .map(DeptPO::getCode)
                 .collect(Collectors.toList());
     }
 

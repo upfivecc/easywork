@@ -39,36 +39,24 @@ public class PermissionRepositoryImpl extends BaseRepositoryImpl<PermissionMappe
             permissionPO.setDeleted(0);
             permissionPO.setVersion(0);
 
-            // 设置层级和路径
-            if (permissionPO.getParentId() != null && permissionPO.getParentId() != 0) {
-                Optional<Permission> parent = findById(permissionPO.getParentId());
+            // 设置层级和路径（基于 parentCode）
+            if (StringUtils.hasText(permissionPO.getParentCode())) {
+                Optional<Permission> parent = findByCode(permissionPO.getParentCode());
                 if (parent.isPresent()) {
                     Permission parentBO = parent.get();
                     permissionPO.setLevel(parentBO.getLevel() + 1);
-                    permissionPO.setPath(parentBO.getPath() + "/" + permissionPO.getId());
+                    permissionPO.setPath(parentBO.getPath() + "/" + permissionPO.getCode());
                 } else {
                     permissionPO.setLevel(1);
-                    permissionPO.setPath("/" + permissionPO.getId());
+                    permissionPO.setPath(permissionPO.getCode());
                 }
             } else {
                 permissionPO.setLevel(1);
-                permissionPO.setParentId(0L);
-                permissionPO.setPath("/" + permissionPO.getId());
+                permissionPO.setParentCode(null);
+                permissionPO.setPath(permissionPO.getCode());
             }
 
             super.save(permissionPO);
-
-            // 保存后更新路径（因为需要实际的ID）
-            if (permissionPO.getParentId() != null && permissionPO.getParentId() != 0) {
-                Optional<Permission> parent = findById(permissionPO.getParentId());
-                if (parent.isPresent()) {
-                    permissionPO.setPath(parent.get().getPath() + "/" + permissionPO.getId());
-                    super.updateById(permissionPO);
-                }
-            } else {
-                permissionPO.setPath("/" + permissionPO.getId());
-                super.updateById(permissionPO);
-            }
         } else {
             // 更新操作
             permissionPO.setUpdateTime(LocalDateTime.now());
@@ -103,14 +91,22 @@ public class PermissionRepositoryImpl extends BaseRepositoryImpl<PermissionMappe
                 .orderByDesc(PermissionPO::getCreateTime);
 
         List<PermissionPO> allPermissions = super.list(queryWrapper);
-        return TreeUtils.buildTree(allPermissions.stream().map(PermissionConverter.INSTANCE::toDomain).toList(), 0L);
+        return TreeUtils.buildTree(allPermissions.stream().map(PermissionConverter.INSTANCE::toDomain).toList(), (String) null);
     }
 
     @Override
-    public List<Permission> findByParentId(Long parentId) {
+    public List<Permission> findByParentCode(String parentCode) {
         LambdaQueryWrapper<PermissionPO> queryWrapper = super.queryWrapper();
-        queryWrapper.eq(PermissionPO::getParentId, parentId != null ? parentId : 0)
-                .orderByAsc(PermissionPO::getSort)
+        if (!StringUtils.hasText(parentCode)) {
+            queryWrapper.and(wrapper -> wrapper
+                    .isNull(PermissionPO::getParentCode)
+                    .or().eq(PermissionPO::getParentCode, "")
+                    .or().eq(PermissionPO::getParentCode, "0")
+            );
+        } else {
+            queryWrapper.eq(PermissionPO::getParentCode, parentCode);
+        }
+        queryWrapper.orderByAsc(PermissionPO::getSort)
                 .orderByDesc(PermissionPO::getCreateTime);
 
         return super.list(queryWrapper).stream().map(PermissionConverter.INSTANCE::toDomain).toList();
