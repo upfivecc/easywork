@@ -1,4 +1,4 @@
-package org.easywork.console.infra.repository;
+package org.easywork.console.infra.repository.base;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;

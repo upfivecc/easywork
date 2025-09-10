@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.easywork.console.domain.repository.DictRepository;
+import org.easywork.console.infra.repository.base.BaseRepositoryImpl;
 import org.easywork.console.infra.repository.converter.DictConverter;
 import org.easywork.console.infra.repository.mapper.DictMapper;
 import org.easywork.console.infra.repository.po.DictPO;

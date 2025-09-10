@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.easywork.console.domain.model.User;
 import org.easywork.console.domain.repository.UserRepository;
+import org.easywork.console.infra.repository.base.BaseRepositoryImpl;
 import org.easywork.console.infra.repository.converter.UserConverter;
 import org.easywork.console.infra.repository.mapper.UserMapper;
 import org.easywork.console.infra.repository.po.UserPO;

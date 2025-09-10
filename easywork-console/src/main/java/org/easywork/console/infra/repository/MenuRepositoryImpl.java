@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import org.easywork.console.domain.model.Menu;
 import org.easywork.console.domain.repository.MenuRepository;
+import org.easywork.console.infra.repository.base.BaseRepositoryImpl;
 import org.easywork.console.infra.repository.converter.MenuConverter;
 import org.easywork.console.infra.repository.mapper.MenuMapper;
 import org.easywork.console.infra.repository.po.MenuPO;

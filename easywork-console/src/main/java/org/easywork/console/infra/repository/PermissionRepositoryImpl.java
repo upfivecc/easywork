@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import org.easywork.console.domain.model.Permission;
 import org.easywork.console.domain.repository.PermissionRepository;
+import org.easywork.console.infra.repository.base.BaseRepositoryImpl;
 import org.easywork.console.infra.repository.converter.PermissionConverter;
 import org.easywork.console.infra.repository.mapper.PermissionMapper;
 import org.easywork.console.infra.repository.po.PermissionPO;

@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.easywork.console.domain.model.Dept;
 import org.easywork.console.domain.repository.DeptRepository;
+import org.easywork.console.infra.repository.base.BaseRepositoryImpl;
 import org.easywork.console.infra.repository.converter.DeptConverter;
 import org.easywork.console.infra.repository.mapper.DeptMapper;
 import org.easywork.console.infra.repository.po.DeptPO;
