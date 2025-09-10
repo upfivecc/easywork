@@ -16,7 +16,6 @@ import org.easywork.console.infra.repository.po.UserPO;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -31,12 +30,12 @@ import java.util.stream.Collectors;
 @Slf4j
 @Repository
 @RequiredArgsConstructor
-public class UserRepositoryImpl extends BaseRepositoryImpl<UserMapper, UserPO> implements UserRepository {
+public class UserRepositoryImpl extends BaseRepositoryImpl<UserMapper, UserPO, User, UserQuery> implements UserRepository {
 
     private final UserMapper userMapper;
 
     @Override
-    public User save(User user) {
+    public User persist(User user) {
         UserPO userPO = UserConverter.INSTANCE.toRepository(user);
         UserPO savedPo = savePo(userPO);
         return UserConverter.INSTANCE.toDomain(savedPo);
@@ -155,25 +154,6 @@ public class UserRepositoryImpl extends BaseRepositoryImpl<UserMapper, UserPO> i
         LambdaQueryWrapper<UserPO> queryWrapper = super.queryWrapper();
         queryWrapper.eq(UserPO::getPhone, phone);
         return userMapper.selectCount(queryWrapper) > 0;
-    }
-
-    @Override
-    public void deleteById(Long id) {
-        // 逻辑删除
-        this.logicalDeleteById(id);
-    }
-
-    @Override
-    public void deleteByIds(List<Long> ids) {
-        // 批量逻辑删除
-        LambdaQueryWrapper<UserPO> queryWrapper = super.queryWrapper();
-        queryWrapper.in(UserPO::getId, ids);
-
-        UserPO updateEntity = new UserPO();
-        updateEntity.setDeleted(1);
-        updateEntity.setUpdateTime(LocalDateTime.now());
-
-        super.update(updateEntity, queryWrapper);
     }
 
     @Override

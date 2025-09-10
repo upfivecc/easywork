@@ -2,7 +2,6 @@ package org.easywork.console.infra.repository;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.easywork.common.rest.result.PageInfo;
 import org.easywork.console.domain.model.Dict;
@@ -15,7 +14,6 @@ import org.easywork.console.infra.repository.po.DictPO;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -28,10 +26,10 @@ import java.util.stream.Collectors;
  * @date 2025/09/09
  */
 @Repository
-public class DictRepositoryImpl extends BaseRepositoryImpl<DictMapper, DictPO> implements DictRepository {
+public class DictRepositoryImpl extends BaseRepositoryImpl<DictMapper, DictPO, Dict, DictQuery> implements DictRepository {
 
     @Override
-    public Dict save(Dict dict) {
+    public Dict persist(Dict dict) {
         DictPO dictPO = DictConverter.INSTANCE.toRepository(dict);
         // 使用基类的通用保存方法
         DictPO savedPO = savePo(dictPO);
@@ -121,29 +119,6 @@ public class DictRepositoryImpl extends BaseRepositoryImpl<DictMapper, DictPO> i
         queryWrapper.eq(DictPO::getCode, code);
 
         return super.count(queryWrapper) > 0;
-    }
-
-    @Override
-    public void deleteById(Long id) {
-        // 使用基类的通用逻辑删除方法
-        logicalDeleteById(id);
-    }
-
-    @Override
-    public void deleteByIds(List<Long> ids) {
-        if (ids == null || ids.isEmpty()) {
-            return;
-        }
-
-        // 批量逻辑删除
-        LambdaQueryWrapper<DictPO> queryWrapper = Wrappers.lambdaQuery(DictPO.class);
-        queryWrapper.in(DictPO::getId, ids);
-
-        DictPO updateEntity = new DictPO();
-        updateEntity.setDeleted(1);
-        updateEntity.setUpdateTime(LocalDateTime.now());
-
-        super.update(updateEntity, queryWrapper);
     }
 
     @Override

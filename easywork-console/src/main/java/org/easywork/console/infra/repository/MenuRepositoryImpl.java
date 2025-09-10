@@ -2,7 +2,6 @@ package org.easywork.console.infra.repository;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.easywork.common.rest.result.PageInfo;
 import org.easywork.console.domain.model.Menu;
@@ -29,10 +28,10 @@ import java.util.stream.Collectors;
  * @date 2025/09/09
  */
 @Repository
-public class MenuRepositoryImpl extends BaseRepositoryImpl<MenuMapper, MenuPO> implements MenuRepository {
+public class MenuRepositoryImpl extends BaseRepositoryImpl<MenuMapper, MenuPO, Menu, MenuQuery> implements MenuRepository {
 
     @Override
-    public Menu save(Menu menu) {
+    public Menu persist(Menu menu) {
         MenuPO menuPO = MenuConverter.INSTANCE.toRepository(menu);
 
         if (menuPO.getId() == null) {
@@ -193,23 +192,6 @@ public class MenuRepositoryImpl extends BaseRepositoryImpl<MenuMapper, MenuPO> i
         queryWrapper.eq(MenuPO::getCode, code);
 
         return super.count(queryWrapper) > 0;
-    }
-
-    @Override
-    public void deleteById(Long id) {
-        this.logicalDeleteById(id);
-    }
-
-    @Override
-    public void deleteByIds(List<Long> ids) {
-        LambdaQueryWrapper<MenuPO> queryWrapper = Wrappers.lambdaQuery(MenuPO.class);
-        queryWrapper.in(MenuPO::getId, ids);
-
-        MenuPO updateEntity = new MenuPO();
-        updateEntity.setDeleted(1);
-        updateEntity.setUpdateTime(LocalDateTime.now());
-
-        super.update(updateEntity, queryWrapper);
     }
 
     @Override

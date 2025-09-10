@@ -15,7 +15,6 @@ import org.easywork.console.infra.repository.po.RolePO;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -28,10 +27,10 @@ import java.util.stream.Collectors;
  * @date 2025/09/09
  */
 @Repository
-public class RoleRepositoryImpl extends BaseRepositoryImpl<RoleMapper, RolePO> implements RoleRepository {
+public class RoleRepositoryImpl extends BaseRepositoryImpl<RoleMapper, RolePO, Role, RoleQuery> implements RoleRepository {
 
     @Override
-    public Role save(Role role) {
+    public Role persist(Role role) {
         RolePO rolePO = RoleConverter.INSTANCE.toRepository(role);
         RolePO savedPo = savePo(rolePO);
         return RoleConverter.INSTANCE.toDomain(savedPo);
@@ -129,28 +128,6 @@ public class RoleRepositoryImpl extends BaseRepositoryImpl<RoleMapper, RolePO> i
                 .eq(RolePO::getDeleted, 0);
 
         return super.count(queryWrapper) > 0;
-    }
-
-    @Override
-    public void deleteById(Long id) {
-        this.logicalDeleteById(id);
-    }
-
-    @Override
-    public void deleteByIds(List<Long> ids) {
-        if (ids == null || ids.isEmpty()) {
-            return;
-        }
-
-        // 批量逻辑删除
-        LambdaQueryWrapper<RolePO> queryWrapper = Wrappers.lambdaQuery(RolePO.class);
-        queryWrapper.in(RolePO::getId, ids);
-
-        RolePO updateEntity = new RolePO();
-        updateEntity.setDeleted(1);
-        updateEntity.setUpdateTime(LocalDateTime.now());
-
-        super.update(updateEntity, queryWrapper);
     }
 
     @Override

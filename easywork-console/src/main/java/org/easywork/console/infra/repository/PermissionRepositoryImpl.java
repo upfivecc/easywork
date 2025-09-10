@@ -2,7 +2,6 @@ package org.easywork.console.infra.repository;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.easywork.common.rest.result.PageInfo;
 import org.easywork.console.domain.model.Permission;
@@ -29,10 +28,10 @@ import java.util.stream.Collectors;
  * @date 2025/09/09
  */
 @Repository
-public class PermissionRepositoryImpl extends BaseRepositoryImpl<PermissionMapper, PermissionPO> implements PermissionRepository {
+public class PermissionRepositoryImpl extends BaseRepositoryImpl<PermissionMapper, PermissionPO, Permission, PermissionQuery> implements PermissionRepository {
 
     @Override
-    public Permission save(Permission permission) {
+    public Permission persist(Permission permission) {
         PermissionPO permissionPO = PermissionConverter.INSTANCE.toRepository(permission);
         if (permissionPO.getId() == null) {
             // 新增操作
@@ -179,24 +178,6 @@ public class PermissionRepositoryImpl extends BaseRepositoryImpl<PermissionMappe
         queryWrapper.eq(PermissionPO::getCode, code);
 
         return super.count(queryWrapper) > 0;
-    }
-
-    @Override
-    public void deleteById(Long id) {
-        this.logicalDeleteById(id);
-    }
-
-    @Override
-    public void deleteByIds(List<Long> ids) {
-        // 批量逻辑删除
-        LambdaQueryWrapper<PermissionPO> queryWrapper = Wrappers.lambdaQuery(PermissionPO.class);
-        queryWrapper.in(PermissionPO::getId, ids);
-
-        PermissionPO updateEntity = new PermissionPO();
-        updateEntity.setDeleted(1);
-        updateEntity.setUpdateTime(LocalDateTime.now());
-
-        super.update(updateEntity, queryWrapper);
     }
 
     @Override

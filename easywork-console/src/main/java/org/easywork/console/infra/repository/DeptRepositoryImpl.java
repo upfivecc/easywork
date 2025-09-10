@@ -33,12 +33,12 @@ import java.util.stream.Collectors;
 @Slf4j
 @Repository
 @RequiredArgsConstructor
-public class DeptRepositoryImpl extends BaseRepositoryImpl<DeptMapper, DeptPO> implements DeptRepository {
+public class DeptRepositoryImpl extends BaseRepositoryImpl<DeptMapper, DeptPO, Dept, DeptQuery> implements DeptRepository {
 
     private final DeptMapper deptMapper;
 
     @Override
-    public Dept save(Dept dept) {
+    public Dept persist(Dept dept) {
         DeptPO deptPO = DeptConverter.INSTANCE.toRepository(dept);
         DeptPO savedPo = savePo(deptPO);
         return DeptConverter.INSTANCE.toDomain(savedPo);
@@ -125,31 +125,9 @@ public class DeptRepositoryImpl extends BaseRepositoryImpl<DeptMapper, DeptPO> i
     }
 
     @Override
-    public void deleteById(Long id) {
-        // 逻辑删除
-        this.logicalDeleteById(id);
-    }
-
-    @Override
-    public void deleteByIds(List<Long> ids) {
-        if (ids == null || ids.isEmpty()) {
-            return;
-        }
-        // 批量逻辑删除
-        LambdaQueryWrapper<DeptPO> queryWrapper = Wrappers.lambdaQuery(DeptPO.class);
-        queryWrapper.in(DeptPO::getId, ids);
-
-        DeptPO updateEntity = new DeptPO();
-        updateEntity.setDeleted(1);
-        updateEntity.setUpdateTime(LocalDateTime.now());
-
-        super.update(updateEntity, queryWrapper);
-    }
-
-    @Override
     public PageInfo<Dept> findByPage(DeptQuery pageQuery) {
         LambdaQueryWrapper<DeptPO> queryWrapper = super.queryWrapper();
-        
+
         // 关键字搜索：部门名称、部门编码、负责人姓名
         String keyword = pageQuery.getKeyword();
         if (StringUtils.hasText(keyword)) {
@@ -159,32 +137,32 @@ public class DeptRepositoryImpl extends BaseRepositoryImpl<DeptMapper, DeptPO> i
                     .or().like(DeptPO::getLeaderName, keyword)
             );
         }
-        
+
         // 可以按部门状态过滤（可选）
         Integer status = pageQuery.getStatus();
         if (status != null) {
             queryWrapper.eq(DeptPO::getStatus, status);
         }
-        
+
         // 可以按部门类型过滤（可选）
         Integer type = pageQuery.getType();
         if (type != null) {
             queryWrapper.eq(DeptPO::getType, type);
         }
-        
+
         // 按层级和排序号排序，再按创建时间降序
         queryWrapper.orderByAsc(DeptPO::getLevel, DeptPO::getSort)
-                    .orderByDesc(DeptPO::getCreateTime);
-        
+                .orderByDesc(DeptPO::getCreateTime);
+
         // 分页查询
         IPage<DeptPO> pageParam = new Page<>(pageQuery.getPageNum(), pageQuery.getPageSize());
         IPage<DeptPO> result = super.page(pageParam, queryWrapper);
-        
+
         // 转换为域对象
         List<Dept> depts = result.getRecords().stream()
                 .map(DeptConverter.INSTANCE::toDomain)
                 .collect(Collectors.toList());
-        
+
         // 构建分页结果
         return PageInfo.<Dept>builder()
                 .page(pageQuery.getPageNum())

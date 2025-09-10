@@ -1,14 +1,19 @@
 package org.easywork.console.infra.repository.base;
 
+import cn.hutool.core.util.ReflectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.easywork.common.rest.request.PageQuery;
+import org.easywork.console.domain.model.base.BaseEntity;
+import org.easywork.console.domain.repository.base.BaseRepository;
 import org.easywork.console.infra.repository.po.base.BasePO;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 基础仓储实现类
@@ -18,7 +23,10 @@ import java.time.LocalDateTime;
  * @version 1.0.0
  * @date 2025/09/10
  */
-public abstract class BaseRepositoryImpl<M extends BaseMapper<T>, T extends BasePO> extends ServiceImpl<M, T> {
+public abstract class BaseRepositoryImpl<M extends BaseMapper<T>, T extends BasePO
+        , B extends BaseEntity, Q extends PageQuery>
+        extends ServiceImpl<M, T>
+        implements BaseRepository<B, Q> {
 
     /**
      * 实体类型，通过反射获取泛型参数
@@ -127,5 +135,26 @@ public abstract class BaseRepositoryImpl<M extends BaseMapper<T>, T extends Base
         }
 
         throw new IllegalStateException("无法获取泛型参数类型，请确保子类正确继承了 BaseRepositoryImpl");
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        this.logicalDeleteById(id);
+    }
+
+    @Override
+    public void deleteByIds(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return;
+        }
+        // 批量逻辑删除
+        LambdaQueryWrapper<T> queryWrapper = Wrappers.lambdaQuery(entityClass);
+        queryWrapper.in(BasePO::getId, ids);
+
+        T updateEntity = ReflectUtil.newInstance(entityClass);
+        updateEntity.setDeleted(1);
+        updateEntity.setUpdateTime(LocalDateTime.now());
+
+        this.update(updateEntity, queryWrapper);
     }
 }

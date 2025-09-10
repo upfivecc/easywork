@@ -11,12 +11,12 @@ import java.util.Optional;
  * 基础仓储接口
  * 提供通用的CRUD操作方法
  *
- * @param <T> 实体类型，必须继承BaseEntity
+ * @param <B> 实体类型，必须继承BaseEntity
  * @author fiveupup
  * @version 1.0.0
  * @date 2025/09/10
  */
-public interface BaseRepository<T extends BaseEntity, Q extends PageQuery> {
+public interface BaseRepository<B extends BaseEntity, Q extends PageQuery> {
 
     /**
      * 保存实体（新增或更新）
@@ -25,7 +25,7 @@ public interface BaseRepository<T extends BaseEntity, Q extends PageQuery> {
      * @param entity 要保存的实体
      * @return 保存后的实体
      */
-    T save(T entity);
+    B persist(B entity);
 
     /**
      * 根据ID查找实体
@@ -33,7 +33,7 @@ public interface BaseRepository<T extends BaseEntity, Q extends PageQuery> {
      * @param id 实体ID
      * @return 实体的Optional包装，如果不存在则返回空Optional
      */
-    Optional<T> findById(Long id);
+    Optional<B> findById(Long id);
 
     /**
      * 根据ID删除实体（逻辑删除）
@@ -55,5 +55,5 @@ public interface BaseRepository<T extends BaseEntity, Q extends PageQuery> {
      * @param query 查询参数
      * @return 分页数据
      */
-    PageInfo<T> findByPage(Q query);
+    PageInfo<B> findByPage(Q query);
 }
