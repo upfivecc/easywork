@@ -82,7 +82,6 @@ public class PermissionRepositoryImpl extends BaseRepositoryImpl<PermissionMappe
      * 权限查询没有特殊逻辑，可以直接使用基类实现
      */
     // findById 方法已由基类 BaseRepositoryImpl 提供
-
     @Override
     public Optional<Permission> findByCode(String code) {
         if (!StringUtils.hasText(code)) {
@@ -208,8 +207,4 @@ public class PermissionRepositoryImpl extends BaseRepositoryImpl<PermissionMappe
                 .orderByDesc(PermissionPO::getCreateTime);
     }
 
-    @Override
-    public long count(PermissionQuery query) {
-        return 0;
-    }
 }

@@ -221,8 +221,4 @@ public class MenuRepositoryImpl extends BaseRepositoryImpl<MenuMapper, MenuPO, M
                 .orderByDesc(MenuPO::getCreateTime);
     }
 
-    @Override
-    public long count(MenuQuery query) {
-        return 0;
-    }
 }

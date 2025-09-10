@@ -244,6 +244,13 @@ public abstract class BaseRepositoryImpl<M extends BaseMapper<T>, T extends Base
                 .build();
     }
 
+    @Override
+    public long count(Q query) {
+        LambdaQueryWrapper<T> queryWrapper = queryWrapper();
+        this.buildQuery(queryWrapper, query);
+        return super.count(queryWrapper);
+    }
+
     protected abstract void buildQuery(LambdaQueryWrapper<T> queryWrapper, Q pageQuery);
 
     /**

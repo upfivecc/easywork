@@ -13,7 +13,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -37,21 +36,6 @@ public class RoleRepositoryImpl extends BaseRepositoryImpl<RoleMapper, RolePO, R
 
         RolePO rolePO = super.getOne(queryWrapper);
         return Optional.ofNullable(RoleConverter.INSTANCE.toDomain(rolePO));
-    }
-
-    @Override
-    public long count(RoleQuery query) {
-        LambdaQueryWrapper<RolePO> queryWrapper = super.queryWrapper();
-
-        if (Objects.nonNull(query)) {
-            queryWrapper.and(wrapper -> wrapper
-                    .like(RolePO::getName, query.getKeyword())
-                    .or().like(RolePO::getCode, query.getKeyword())
-                    .or().like(RolePO::getDescription, query.getKeyword())
-            );
-        }
-
-        return super.count(queryWrapper);
     }
 
     @Override

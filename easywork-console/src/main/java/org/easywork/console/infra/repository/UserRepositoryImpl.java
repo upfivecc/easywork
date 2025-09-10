@@ -14,7 +14,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -57,23 +56,6 @@ public class UserRepositoryImpl extends BaseRepositoryImpl<UserMapper, UserPO, U
         UserPO userPO = userMapper.selectOne(queryWrapper);
         return Optional.ofNullable(userPO)
                 .map(UserConverter.INSTANCE::toDomain);
-    }
-
-    @Override
-    public long count(UserQuery query) {
-        LambdaQueryWrapper<UserPO> queryWrapper = super.queryWrapper();
-
-        if (Objects.nonNull(query)) {
-            queryWrapper.and(wrapper -> wrapper
-                    .like(UserPO::getUsername, query.getKeyword())
-                    .or().like(UserPO::getNickname, query.getKeyword())
-                    .or().like(UserPO::getRealName, query.getKeyword())
-                    .or().like(UserPO::getEmail, query.getKeyword())
-                    .or().like(UserPO::getPhone, query.getKeyword())
-            );
-        }
-
-        return userMapper.selectCount(queryWrapper);
     }
 
     @Override

@@ -135,11 +135,6 @@ public class DeptRepositoryImpl extends BaseRepositoryImpl<DeptMapper, DeptPO, D
     }
 
     @Override
-    public long count(DeptQuery query) {
-        return 0;
-    }
-
-    @Override
     public List<Long> findAllChildrenIds(Long deptId) {
         List<DeptPO> children = deptMapper.selectAllChildren(deptId);
         return children.stream()

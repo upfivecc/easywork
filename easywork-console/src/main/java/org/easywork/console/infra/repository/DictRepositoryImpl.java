@@ -12,7 +12,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -36,19 +35,6 @@ public class DictRepositoryImpl extends BaseRepositoryImpl<DictMapper, DictPO, D
 
         DictPO dictPO = super.getOne(queryWrapper);
         return Optional.ofNullable(DictConverter.INSTANCE.toDomain(dictPO));
-    }
-
-    @Override
-    public long count(DictQuery query) {
-        LambdaQueryWrapper<DictPO> queryWrapper = super.queryWrapper();
-        if (Objects.nonNull(query)) {
-            queryWrapper.and(wrapper -> wrapper
-                    .like(DictPO::getName, query.getKeyword())
-                    .or().like(DictPO::getCode, query.getStatus())
-            );
-        }
-
-        return super.count(queryWrapper);
     }
 
     @Override
