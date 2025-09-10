@@ -1,6 +1,8 @@
 package org.easywork.console.domain.model;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import org.easywork.console.domain.model.base.BaseEntity;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -10,8 +12,9 @@ import java.util.List;
  * @version: 1.0.0
  * @date: 2025/9/10 09:53
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
-public class User {
+public class User extends BaseEntity {
 
     /**
      * 用户名

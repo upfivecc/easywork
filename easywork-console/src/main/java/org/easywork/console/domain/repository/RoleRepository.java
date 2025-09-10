@@ -1,6 +1,7 @@
 package org.easywork.console.domain.repository;
 
 import org.easywork.console.domain.model.Role;
+import org.easywork.console.domain.repository.base.BaseRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -10,17 +11,7 @@ import java.util.Optional;
  * @version: 1.0.0
  * @date: 2025/9/10 09:08
  */
-public interface RoleRepository {
-
-    /**
-     * 保存角色
-     */
-    Role save(Role role);
-
-    /**
-     * 根据ID查找角色
-     */
-    Optional<Role> findById(Long id);
+public interface RoleRepository extends BaseRepository<Role> {
 
     /**
      * 根据角色代码查找角色
@@ -52,13 +43,4 @@ public interface RoleRepository {
      */
     boolean existsByCode(String code);
 
-    /**
-     * 删除角色
-     */
-    void deleteById(Long id);
-
-    /**
-     * 批量删除角色
-     */
-    void deleteByIds(List<Long> ids);
 }

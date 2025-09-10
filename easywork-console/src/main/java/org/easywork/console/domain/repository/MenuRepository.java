@@ -1,6 +1,7 @@
 package org.easywork.console.domain.repository;
 
 import org.easywork.console.domain.model.Menu;
+import org.easywork.console.domain.repository.base.BaseRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -10,17 +11,7 @@ import java.util.Optional;
  * @version: 1.0.0
  * @date: 2025/9/10 09:08
  */
-public interface MenuRepository {
-
-    /**
-     * 保存菜单
-     */
-    Menu save(Menu menu);
-
-    /**
-     * 根据ID查找菜单
-     */
-    Optional<Menu> findById(Long id);
+public interface MenuRepository extends BaseRepository<Menu> {
 
     /**
      * 根据菜单代码查找菜单
@@ -67,13 +58,4 @@ public interface MenuRepository {
      */
     boolean existsByCode(String code);
 
-    /**
-     * 删除菜单
-     */
-    void deleteById(Long id);
-
-    /**
-     * 批量删除菜单
-     */
-    void deleteByIds(List<Long> ids);
 }

@@ -1,6 +1,8 @@
 package org.easywork.console.domain.model;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import org.easywork.console.domain.model.base.BaseEntity;
 
 import java.time.LocalDateTime;
 
@@ -9,8 +11,9 @@ import java.time.LocalDateTime;
  * @version: 1.0.0
  * @date: 2025/9/10 10:28
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
-public class LoginLog {
+public class LoginLog extends BaseEntity {
 
     /**
      * 用户ID

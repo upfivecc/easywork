@@ -3,30 +3,31 @@ package org.easywork.console.domain.model;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.easywork.console.domain.model.base.BaseEntity;
+import org.easywork.console.infra.repository.po.DictItemPO;
 
 import java.util.List;
 
 /**
  * @author: upfive
  * @version: 1.0.0
- * @date: 2025/9/10 09:54
+ * @date: 2025/9/10 15:48
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class Role extends BaseEntity {
+public class Dict extends BaseEntity {
 
     /**
-     * 角色名称
+     * 字典名称
      */
     private String name;
 
     /**
-     * 角色代码
+     * 字典编码
      */
     private String code;
 
     /**
-     * 角色描述
+     * 字典描述
      */
     private String description;
 
@@ -34,11 +35,6 @@ public class Role extends BaseEntity {
      * 状态 1-启用 0-禁用
      */
     private Integer status;
-
-    /**
-     * 数据范围 1-全部数据 2-本部门及以下数据 3-本部门数据 4-仅本人数据 5-自定义数据
-     */
-    private Integer dataScope;
 
     /**
      * 排序号
@@ -51,24 +47,14 @@ public class Role extends BaseEntity {
     private String remark;
 
     /**
-     * 角色权限列表
+     * 字典项列表
      */
-    private List<Permission> permissions;
+    private List<DictItemPO> items;
 
     /**
-     * 检查角色是否启用
+     * 检查字典是否启用
      */
     public boolean isEnabled() {
         return status != null && status == 1;
-    }
-
-    /**
-     * 检查角色是否有指定权限
-     */
-    public boolean hasPermission(String permissionCode) {
-        if (permissions == null || permissions.isEmpty()) {
-            return false;
-        }
-        return permissions.stream().anyMatch(p -> permissionCode.equals(p.getCode()));
     }
 }

@@ -1,6 +1,7 @@
 package org.easywork.console.domain.repository;
 
 import org.easywork.console.domain.model.Dept;
+import org.easywork.console.domain.repository.base.BaseRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -12,18 +13,9 @@ import java.util.Optional;
  * @version 1.0.0
  * @date 2025/09/09
  */
-public interface DeptRepository {
+public interface DeptRepository extends BaseRepository<Dept> {
     
-    /**
-     * 保存部门
-     */
-    Dept save(Dept dept);
-    
-    /**
-     * 根据ID查找部门
-     */
-    Optional<Dept> findById(Long id);
-    
+
     /**
      * 根据部门编码查找部门
      */
@@ -58,16 +50,6 @@ public interface DeptRepository {
      * 检查部门编码是否存在
      */
     boolean existsByCode(String code);
-    
-    /**
-     * 删除部门
-     */
-    void deleteById(Long id);
-    
-    /**
-     * 批量删除部门
-     */
-    void deleteByIds(List<Long> ids);
     
     /**
      * 查找指定部门的所有子部门ID（包括孙部门）

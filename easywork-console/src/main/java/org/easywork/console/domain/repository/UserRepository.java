@@ -1,6 +1,7 @@
 package org.easywork.console.domain.repository;
 
 import org.easywork.console.domain.model.User;
+import org.easywork.console.domain.repository.base.BaseRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -10,17 +11,7 @@ import java.util.Optional;
  * @version: 1.0.0
  * @date: 2025/9/10 09:07
  */
-public interface UserRepository {
-
-    /**
-     * 保存用户
-     */
-    User save(User user);
-
-    /**
-     * 根据ID查找用户
-     */
-    Optional<User> findById(Long id);
+public interface UserRepository extends BaseRepository<User> {
 
     /**
      * 根据用户名查找用户
@@ -72,13 +63,4 @@ public interface UserRepository {
      */
     boolean existsByPhone(String phone);
 
-    /**
-     * 删除用户
-     */
-    void deleteById(Long id);
-
-    /**
-     * 批量删除用户
-     */
-    void deleteByIds(List<Long> ids);
 }

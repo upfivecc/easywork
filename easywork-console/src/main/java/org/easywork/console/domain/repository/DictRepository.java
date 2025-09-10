@@ -1,6 +1,7 @@
 package org.easywork.console.domain.repository;
 
-import cn.hutool.core.lang.Dict;
+import org.easywork.console.domain.model.Dict;
+import org.easywork.console.domain.repository.base.BaseRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -10,17 +11,7 @@ import java.util.Optional;
  * @version: 1.0.0
  * @date: 2025/9/10 09:09
  */
-public interface DictRepository {
-
-    /**
-     * 保存字典
-     */
-    Dict save(Dict dict);
-
-    /**
-     * 根据ID查找字典
-     */
-    Optional<Dict> findById(Long id);
+public interface DictRepository extends BaseRepository<Dict> {
 
     /**
      * 根据字典编码查找字典
@@ -47,13 +38,4 @@ public interface DictRepository {
      */
     boolean existsByCode(String code);
 
-    /**
-     * 删除字典
-     */
-    void deleteById(Long id);
-
-    /**
-     * 批量删除字典
-     */
-    void deleteByIds(List<Long> ids);
 }

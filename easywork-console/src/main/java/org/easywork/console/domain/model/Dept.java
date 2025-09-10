@@ -2,7 +2,7 @@ package org.easywork.console.domain.model;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.easywork.console.infra.repository.po.base.BasePO;
+import org.easywork.console.domain.model.base.BaseEntity;
 
 import java.util.List;
 
@@ -15,7 +15,7 @@ import java.util.List;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class Dept extends BasePO {
+public class Dept extends BaseEntity {
 
     /**
      * 父部门ID

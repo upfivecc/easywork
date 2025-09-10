@@ -1,6 +1,6 @@
 package org.easywork.console.infra.repository.converter;
 
-import cn.hutool.core.lang.Dict;
+import org.easywork.console.domain.model.Dict;
 import org.easywork.console.infra.repository.po.DictPO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;

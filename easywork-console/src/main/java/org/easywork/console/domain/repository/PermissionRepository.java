@@ -1,6 +1,7 @@
 package org.easywork.console.domain.repository;
 
 import org.easywork.console.domain.model.Permission;
+import org.easywork.console.domain.repository.base.BaseRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -10,18 +11,7 @@ import java.util.Optional;
  * @version: 1.0.0
  * @date: 2025/9/10 09:08
  */
-public interface PermissionRepository {
-
-    /**
-     * 保存权限
-     */
-    Permission save(Permission permission);
-
-    /**
-     * 根据ID查找权限
-     */
-    Optional<Permission> findById(Long id);
-
+public interface PermissionRepository extends BaseRepository<Permission> {
     /**
      * 根据权限代码查找权限
      */
@@ -62,13 +52,4 @@ public interface PermissionRepository {
      */
     boolean existsByCode(String code);
 
-    /**
-     * 删除权限
-     */
-    void deleteById(Long id);
-
-    /**
-     * 批量删除权限
-     */
-    void deleteByIds(List<Long> ids);
 }

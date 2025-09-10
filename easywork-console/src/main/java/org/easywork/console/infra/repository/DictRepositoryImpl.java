@@ -1,10 +1,10 @@
 package org.easywork.console.infra.repository;
 
-import cn.hutool.core.lang.Dict;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.easywork.console.domain.model.Dict;
 import org.easywork.console.domain.repository.DictRepository;
 import org.easywork.console.infra.repository.base.BaseRepositoryImpl;
 import org.easywork.console.infra.repository.converter.DictConverter;
